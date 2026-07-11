@@ -1,0 +1,17 @@
+export const TOPIC_OPTIONS = [
+  "Arrays",
+  "Strings",
+  "Linked List",
+  "Stacks & Queues",
+  "Hashing",
+  "Trees",
+  "Graphs",
+  "Dynamic Programming",
+  "Greedy",
+  "Backtracking",
+  "Binary Search",
+  "Sliding Window",
+  "Heaps",
+  "Bit Manipulation",
+  "Math",
+];
