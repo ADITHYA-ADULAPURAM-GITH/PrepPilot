@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Space Grotesk", "Inter", sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --color-base: #0a0a0f;
+  --color-surface: #0f0f17;
+  --color-surface-hover: #14141f;
+  --color-border: #1f1f2b;
+
+  --color-primary: #5b4fe8;
+  --color-primary-hover: #6e62f2;
+  --color-primary-muted: #5b4fe81a;
+
+  --color-accent: #f5b942;
+  --color-accent-muted: #f5b9421a;
+
+  --color-success: #34d399;
+  --color-danger: #f87171;
+
+  --color-text: #f5f5f7;
+  --color-text-muted: #8a8a99;
+  --color-text-faint: #55555f;
+
+  --shadow-glow: 0 0 60px -12px rgba(91, 79, 232, 0.35);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-base);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background-color: var(--color-primary-muted);
+    color: var(--color-text);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  .glass {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .text-gradient {
+    background: linear-gradient(135deg, #ffffff 0%, #a89bff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
