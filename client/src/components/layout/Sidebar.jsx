@@ -16,7 +16,7 @@ import { ROUTES } from "@/lib/constants";
 const NAV_ITEMS = [
   { label: "Dashboard", icon: LayoutDashboard, to: ROUTES.DASHBOARD, active: true },
   { label: "DSA Tracker", icon: Code2, to: ROUTES.DSA_TRACKER, active: true },
-  { label: "CS Subjects", icon: BookOpen, active: false },
+  { label: "CS Subjects", icon: BookOpen, to: ROUTES.CS_SUBJECTS, active: true },
   { label: "Companies", icon: Building2, active: false },
   { label: "Mock Tests", icon: ClipboardList, active: false },
   { label: "Resume", icon: FileText, active: false },
