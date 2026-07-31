@@ -10,6 +10,7 @@ import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
 import DashboardPage from "@/pages/DashboardPage";
 import DsaTrackerPage from "@/pages/DsaTrackerPage";
 import CsSubjectsPage from "@/pages/CsSubjectsPage";
+import SubjectDetailsPage from "@/pages/SubjectDetailsPage";
 
 export function AppRoutes() {
   return (
@@ -27,6 +28,10 @@ export function AppRoutes() {
           <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
           <Route path={ROUTES.DSA_TRACKER} element={<DsaTrackerPage />} />
           <Route path={ROUTES.CS_SUBJECTS} element={<CsSubjectsPage />} />
+          <Route
+            path={`${ROUTES.CS_SUBJECTS}/:subjectSlug`}
+            element={<SubjectDetailsPage />}
+          />
         </Route>
       </Route>
 
