@@ -3,7 +3,7 @@ import { DashboardSkeleton } from "@/features/dashboard/components/DashboardSkel
 import { WelcomeHero } from "@/features/dashboard/components/WelcomeHero";
 import { ReadinessScoreCard } from "@/features/dashboard/components/ReadinessScoreCard";
 import { QuickStatsGrid } from "@/features/dashboard/components/QuickStatsGrid";
-import { WeeklyProgressChart } from "@/features/dashboard/components/WeeklyProgressChart";
+import { WeeklyProgressPlaceholder } from "@/features/dashboard/components/WeeklyProgressPlaceholder";
 import { TodaysTasks } from "@/features/dashboard/components/TodaysTasks";
 import { RecentActivity } from "@/features/dashboard/components/RecentActivity";
 import { AIAssistantCard } from "@/features/dashboard/components/AIAssistantCard";
@@ -38,7 +38,7 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <WeeklyProgressChart data={data.weeklyProgress} />
+          <WeeklyProgressPlaceholder />
         </div>
         <TodaysTasks tasks={data.tasks} />
       </div>

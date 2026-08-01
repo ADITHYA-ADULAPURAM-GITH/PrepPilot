@@ -1,3 +1,5 @@
+//AppRoutes.jsx
+
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthLayout } from "@/components/layout/AuthLayout";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
@@ -11,6 +13,10 @@ import DashboardPage from "@/pages/DashboardPage";
 import DsaTrackerPage from "@/pages/DsaTrackerPage";
 import CsSubjectsPage from "@/pages/CsSubjectsPage";
 import SubjectDetailsPage from "@/pages/SubjectDetailsPage";
+import CompaniesPage from "@/pages/CompaniesPage";
+import CompanyDetailsPage from "@/pages/CompanyDetailsPage";
+import ResumePage from "@/pages/ResumePage";
+import StudyPlannerPage from "@/pages/StudyPlannerPage";
 
 export function AppRoutes() {
   return (
@@ -32,6 +38,10 @@ export function AppRoutes() {
             path={`${ROUTES.CS_SUBJECTS}/:subjectSlug`}
             element={<SubjectDetailsPage />}
           />
+          <Route path={ROUTES.COMPANIES} element={<CompaniesPage />} />
+          <Route path={ROUTES.COMPANY_DETAILS} element={<CompanyDetailsPage />} />
+          <Route path={ROUTES.RESUME} element={<ResumePage />} />
+          <Route path={ROUTES.STUDY_PLANNER} element={<StudyPlannerPage />} />
         </Route>
       </Route>
 

@@ -11,4 +11,5 @@ function cleanParams(params = {}) {
 
 export const companiesApi = {
   list: (params) => axiosInstance.get("/companies", { params: cleanParams(params) }),
+  getById: (id) => axiosInstance.get(`/companies/${id}`),
 };

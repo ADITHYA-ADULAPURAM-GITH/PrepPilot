@@ -23,15 +23,7 @@ export const mockDashboardData = {
     { label: "Current Streak", value: "12 days", change: "Personal best: 21" },
     { label: "Companies Covered", value: 9, change: "+2 this week" },
   ],
-  weeklyProgress: [
-    { day: "Mon", hours: 2.5 },
-    { day: "Tue", hours: 3.2 },
-    { day: "Wed", hours: 1.8 },
-    { day: "Thu", hours: 4.0 },
-    { day: "Fri", hours: 2.1 },
-    { day: "Sat", hours: 3.6 },
-    { day: "Sun", hours: 2.9 },
-  ],
+  
   tasks: [
     { id: "t1", label: "Solve 3 Graph problems (Medium)", done: true },
     { id: "t2", label: "Revise DBMS — Normalization", done: true },

@@ -1,0 +1,1 @@
+export const noopValidator = (req, res, next) => next();

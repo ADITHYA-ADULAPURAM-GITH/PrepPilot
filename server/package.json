@@ -4,10 +4,10 @@
   "type": "module",
   "main": "server.js",
   "scripts": {
-  "dev": "nodemon server.js",
-  "start": "node server.js",
-  "seed": "node scripts/seedSubjects.js"
-},
+    "dev": "nodemon server.js",
+    "start": "node server.js",
+    "seed": "node scripts/seedSubjects.js"
+  },
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
@@ -19,6 +19,7 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.7.4",
     "morgan": "^1.11.0",
+    "multer": "^2.2.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {

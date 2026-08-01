@@ -17,10 +17,10 @@ const NAV_ITEMS = [
   { label: "Dashboard", icon: LayoutDashboard, to: ROUTES.DASHBOARD, active: true },
   { label: "DSA Tracker", icon: Code2, to: ROUTES.DSA_TRACKER, active: true },
   { label: "CS Subjects", icon: BookOpen, to: ROUTES.CS_SUBJECTS, active: true },
-  { label: "Companies", icon: Building2, active: false },
+  { label: "Companies", icon: Building2, to: ROUTES.COMPANIES, active: true },
   { label: "Mock Tests", icon: ClipboardList, active: false },
-  { label: "Resume", icon: FileText, active: false },
-  { label: "Calendar", icon: CalendarDays, active: false },
+  { label: "Resume", icon: FileText, to: ROUTES.RESUME, active: true },
+  { label: "Study Planner", icon: CalendarDays, to: ROUTES.STUDY_PLANNER, active: true },
   { label: "Analytics", icon: BarChart3, active: false },
 ];
 
