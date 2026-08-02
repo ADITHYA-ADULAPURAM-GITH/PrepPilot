@@ -18,10 +18,10 @@ const NAV_ITEMS = [
   { label: "DSA Tracker", icon: Code2, to: ROUTES.DSA_TRACKER, active: true },
   { label: "CS Subjects", icon: BookOpen, to: ROUTES.CS_SUBJECTS, active: true },
   { label: "Companies", icon: Building2, to: ROUTES.COMPANIES, active: true },
-  { label: "Mock Tests", icon: ClipboardList, active: false },
+  { label: "Mock Tests", icon: ClipboardList, to: ROUTES.MOCK_TESTS, active: true },
   { label: "Resume", icon: FileText, to: ROUTES.RESUME, active: true },
   { label: "Study Planner", icon: CalendarDays, to: ROUTES.STUDY_PLANNER, active: true },
-  { label: "Analytics", icon: BarChart3, active: false },
+  
 ];
 
 export function Sidebar() {

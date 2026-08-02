@@ -17,6 +17,8 @@ import CompaniesPage from "@/pages/CompaniesPage";
 import CompanyDetailsPage from "@/pages/CompanyDetailsPage";
 import ResumePage from "@/pages/ResumePage";
 import StudyPlannerPage from "@/pages/StudyPlannerPage";
+import MockTestsPage from "@/pages/MockTestsPage";
+import MockTestDetailsPage from "@/pages/MockTestDetailsPage";
 
 export function AppRoutes() {
   return (
@@ -42,6 +44,8 @@ export function AppRoutes() {
           <Route path={ROUTES.COMPANY_DETAILS} element={<CompanyDetailsPage />} />
           <Route path={ROUTES.RESUME} element={<ResumePage />} />
           <Route path={ROUTES.STUDY_PLANNER} element={<StudyPlannerPage />} />
+          <Route path={ROUTES.MOCK_TESTS} element={<MockTestsPage />} />
+          <Route path={ROUTES.MOCK_TEST_DETAILS} element={<MockTestDetailsPage />} />
         </Route>
       </Route>
 

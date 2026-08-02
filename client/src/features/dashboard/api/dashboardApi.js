@@ -71,17 +71,20 @@ export const dashboardApi = {
     const activity = [...dsaActivity, ...MOCK_ONLY.nonDsaActivity].slice(0, 6);
 
     const today = new Date();
-    const tasks = allTasks
-      .filter((t) => isSameDay(new Date(t.dueDate), today))
-      .map((t) => ({ id: t._id, label: t.title, done: t.isCompleted }));
+const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate()); // midnight, for date-only comparisons
 
-    const sevenDaysOut = new Date();
-    sevenDaysOut.setDate(today.getDate() + 7);
-    const deadlines = allTasks
-      .filter((t) => !t.isCompleted && new Date(t.dueDate) >= today && new Date(t.dueDate) <= sevenDaysOut)
-      .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
-      .slice(0, 5)
-      .map((t) => ({ id: t._id, type: "task", title: t.title, date: formatDeadlineDate(t.dueDate) }));
+const tasks = allTasks
+  .filter((t) => isSameDay(new Date(t.dueDate), today))
+  .map((t) => ({ id: t._id, label: t.title, done: t.isCompleted }));
+
+const sevenDaysOut = new Date(todayStart);
+sevenDaysOut.setDate(todayStart.getDate() + 7);
+
+const deadlines = allTasks
+  .filter((t) => !t.isCompleted && new Date(t.dueDate) >= todayStart && new Date(t.dueDate) <= sevenDaysOut)
+  .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
+  .slice(0, 5)
+  .map((t) => ({ id: t._id, type: "task", title: t.title, date: formatDeadlineDate(t.dueDate) }));
 
     return { user: { streak: MOCK_ONLY.streak }, readiness: { overall, breakdown }, stats, activity, tasks, deadlines };
   },

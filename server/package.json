@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js",
-    "seed": "node scripts/seedSubjects.js"
+    "seed": "node scripts/seedSubjects.js",
+    "seed:mocktests": "node scripts/seedMockTests.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

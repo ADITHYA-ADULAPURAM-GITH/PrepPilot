@@ -6,6 +6,7 @@ import companyRoutes from "./companyRoutes.js";
 import resumeRoutes from "./resumeRoutes.js";
 import studyTaskRoutes from "./studyTaskRoutes.js";
 import analyticsRoutes from "./analyticsRoutes.js";
+import mockTestRoutes from "./mockTestRoutes.js";
 
 const router = Router();
 
@@ -16,6 +17,7 @@ router.use("/companies", companyRoutes);
 router.use("/resume", resumeRoutes);
 router.use("/study-tasks", studyTaskRoutes);
 router.use("/analytics", analyticsRoutes);
+router.use("/mocktests", mockTestRoutes);
 // Future domains mount here: router.use("/mocktests", mockTestRoutes); etc.
 
 export default router;
