@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react";
 
 export function ProtectedRoute() {
   const { isAuthenticated, isLoading } = useAuth();
+  console.log("ProtectedRoute check:", { isAuthenticated, isLoading, path: window.location.pathname });
 
   if (isLoading) {
     return (

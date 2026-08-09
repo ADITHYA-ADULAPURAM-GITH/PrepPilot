@@ -27,7 +27,9 @@ function AttemptSkeleton() {
 }
 
 export default function MockTestAttemptPage() {
+  
   const { attemptId } = useParams();
+  console.log("AttemptPage rendered, attemptId param =", attemptId);
   const navigate = useNavigate();
 
   const { data, isLoading, isError } = useAttemptQuestions(attemptId);

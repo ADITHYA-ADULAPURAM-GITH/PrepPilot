@@ -29,6 +29,7 @@ function MockTestDetailsSkeleton() {
 }
 
 export default function MockTestDetailsPage() {
+  
   const { testId } = useParams();
   const navigate = useNavigate();
   const { data: test, isLoading, isError } = useMockTest(testId);
@@ -59,19 +60,29 @@ export default function MockTestDetailsPage() {
     );
   }
 
+  
   function handleStart() {
-    startAttemptMutation.mutate(test._id, {
-      onSuccess: ({ data }) => {
-        const attempt = data.data.attempt;
-        // ROUTES.MOCK_TEST_ATTEMPT doesn't exist yet — the attempt page
-        // isn't built this batch, per scope. This navigate call is
-        // correct once that route exists; until then it 404s to the
-        // catch-all redirect, same known gap as MockTestCard's link
-        // last batch.
-        navigate(ROUTES.MOCK_TEST_ATTEMPT.replace(":attemptId", attempt._id));
-      },
-    });
-  }
+  console.log("1. Starting", test._id);
+
+  startAttemptMutation.mutate(test._id, {
+    onSuccess: ({ data }) => {
+      console.log("2. Mutation success", data);
+
+      const attempt = data.data.attempt;
+      console.log("3. Attempt ID", attempt?._id);
+
+      const path = ROUTES.MOCK_TEST_ATTEMPT.replace(":attemptId", attempt._id);
+      console.log("4. Navigate to", path);
+
+      navigate(path);
+
+      console.log("5. Navigate called");
+    },
+    onError: (err) => {
+      console.error("Mutation error:", err);
+    },
+  });
+}
 
   return (
     <div className="space-y-6">
