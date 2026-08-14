@@ -9,9 +9,9 @@ export function DashboardSkeleton() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <Card className="p-6 lg:col-span-2">
           <Skeleton className="h-5 w-40" />
-          <div className="mt-4 flex items-center gap-6">
+          <div className="mt-4 flex flex-col items-center gap-6 sm:flex-row sm:items-center">
             <Skeleton className="size-[168px] shrink-0 rounded-full" />
-            <div className="flex-1 space-y-3.5">
+            <div className="w-full flex-1 space-y-3.5">
               {Array.from({ length: 5 }).map((_, i) => (
                 <Skeleton key={i} className="h-2.5 w-full" />
               ))}

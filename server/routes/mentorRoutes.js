@@ -20,5 +20,6 @@ const mentorLimiter = rateLimit({
 
 router.get("/conversation", mentorController.getConversation);
 router.post("/chat", mentorLimiter, mentorController.sendMessage);
+router.patch("/identity", mentorController.updateIdentity);
 
 export default router;

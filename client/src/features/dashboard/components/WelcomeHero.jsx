@@ -40,7 +40,7 @@ export function WelcomeHero({ streak = 0 }) {
           <p className="mt-2 max-w-lg text-[14px] leading-relaxed text-text-muted">{line}</p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2 rounded-xl border border-border bg-white/[0.03] px-4 py-2.5">
             <Flame className="size-4 text-accent" />
             <div className="leading-none">

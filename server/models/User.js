@@ -55,6 +55,19 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+      mentor: {
+      name: {
+        type: String,
+        trim: true,
+        maxlength: 40,
+        default: null,
+      },
+      avatar: {
+        type: String,
+        enum: ["male", "female"],
+        default: null,
+      },
+    },
   },
   { timestamps: true }
 );
@@ -80,6 +93,7 @@ userSchema.methods.toSafeObject = function toSafeObject() {
     role: this.role,
     isEmailVerified: this.isEmailVerified,
     createdAt: this.createdAt,
+    mentor: this.mentor,
   };
 };
 

@@ -2,6 +2,8 @@ import { analyticsService } from "./analyticsService.js";
 import { MentorConversation } from "../models/MentorConversation.js";
 import { TestAttempt } from "../models/TestAttempt.js";
 import { generateMentorReply } from "./geminiClient.js";
+import { User } from "../models/User.js";
+import { ApiError } from "../utils/apiResponse.js";
 
 const MAX_HISTORY_MESSAGES = 20;
 
@@ -55,9 +57,9 @@ async function buildUserContext(userId) {
   };
 }
 
-function buildSystemPrompt(context) {
+function buildSystemPrompt(context, mentorName) {
   return `You are the PrepPilot Mentor — a placement-preparation mentor, analyst, and interview-prep assistant for a college student using the PrepPilot platform.
-
+${mentorName ? `\nYour configured name is "${mentorName}". You may refer to yourself by this name when it feels natural (e.g. introducing yourself), but do NOT prefix every response with it.\n` : ""}
 You are NOT a general-purpose chatbot. Only discuss placement preparation: DSA, CS subjects, mock tests, study planning, resumes, and interview readiness.
 
 Ground every answer in the student's actual PrepPilot data below. Never invent progress, scores, or activity that isn't in this data. If something isn't tracked (e.g. resume content quality, mock interviews, projects), say so plainly instead of guessing.
@@ -68,12 +70,19 @@ HOW TO USE THE DATA — read this before every reply:
 - Weakness/diagnostic questions ("why am I weak in X") should reference only the data related to X, not unrelated categories.
 - Planning questions ("what should I study today", "give me a study plan") should use the data to justify recommendations, not restate it as a report.
 - Never repeat a statistic you already stated earlier in this conversation unless the user is asking about it again specifically.
-- Default to the shortest response that fully answers the question. Expand only when the question is broad (e.g. "am I ready for placements?").
+
+RESPONSE LENGTH — match effort to the question, don't default to long:
+- Greetings, identity, yes/no, or single-fact questions: 1-3 sentences. No headings, no bullet lists, no markdown structure needed.
+- Explanation or "why" questions: a short paragraph or a few tight bullets — enough to actually explain, not a report.
+- Requests for a plan, strategy, comparison, multi-day schedule, or "give me a full breakdown": this is the one case where real structure earns its place — use headings and/or numbered lists, and go into genuine depth using the user's real data.
+- When in doubt, answer the shortest way that fully and honestly answers what was asked.
+
+Use markdown (headings, bold, bullet lists, numbered lists, inline code) only where it genuinely improves readability for the response's length and purpose — not by default on short answers.
 
 CURRENT USER DATA (JSON):
 ${JSON.stringify(context, null, 2)}
 
-Be direct and specific. Use markdown formatting (bold, bullet lists, numbered lists) where it genuinely improves readability — not by default on every response.`;
+Be direct and specific.`;
 }
 
 async function getOrCreateConversation(userId) {
@@ -90,10 +99,10 @@ export const mentorService = {
     return conversation.messages;
   },
 
-  async sendMessage(userId, userMessage) {
+  async sendMessage(userId, userMessage, mentorName) {
     const conversation = await getOrCreateConversation(userId);
     const context = await buildUserContext(userId);
-    const systemPrompt = buildSystemPrompt(context);
+    const systemPrompt = buildSystemPrompt(context, mentorName);
 
     const history = conversation.messages.slice(-MAX_HISTORY_MESSAGES);
     const replyText = await generateMentorReply(systemPrompt, history, userMessage);
@@ -103,5 +112,15 @@ export const mentorService = {
     await conversation.save();
 
     return { reply: replyText, messages: conversation.messages };
+  },
+
+  async updateIdentity(userId, { name, avatar }) {
+    const user = await User.findById(userId);
+    if (!user) throw new ApiError(404, "User not found");
+
+    user.mentor = { name, avatar };
+    await user.save();
+
+    return user.toSafeObject();
   },
 };
