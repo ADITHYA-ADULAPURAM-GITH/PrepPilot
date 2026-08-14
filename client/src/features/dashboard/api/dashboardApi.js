@@ -1,19 +1,6 @@
-import { mockDashboardData } from "@/features/dashboard/mockData";
 import { problemsApi } from "@/features/dsa-tracker/api/problemsApi";
 import { analyticsApi } from "@/features/analytics/api/analyticsApi";
 import { studyTaskApi } from "@/features/study-planner/api/studyTaskApi";
-
-// Every field below has no backing module yet (Mock Tests, Projects, AI
-// Assistant, streak tracking). Isolated in one place so removing mock
-// data later is a one-line deletion here, not a hunt through the file.
-const MOCK_ONLY = {
-  streak: mockDashboardData.user.streak,
-  mockInterviewsReadiness: mockDashboardData.readiness.breakdown.find((b) => b.label === "Mock Interviews").value,
-  projectsReadiness: mockDashboardData.readiness.breakdown.find((b) => b.label === "Projects").value,
-  todaysGoalStat: mockDashboardData.stats.find((s) => s.label === "Today's Goal"),
-  currentStreakStat: mockDashboardData.stats.find((s) => s.label === "Current Streak"),
-  nonDsaActivity: mockDashboardData.activity.filter((a) => a.type !== "dsa"),
-};
 
 function timeAgo(dateStr) {
   const diffMs = Date.now() - new Date(dateStr).getTime();
@@ -44,48 +31,68 @@ export const dashboardApi = {
     const analytics = analyticsRes.data.data;
     const allTasks = tasksRes.data.data.tasks;
 
-    // Resume readiness is a real signal, just a binary one — no scoring
-    // model exists, so "uploaded" maps to 100, "not uploaded" to 0.
+    
     const breakdown = [
       { label: "DSA", value: analytics.dsa.completionPercentage },
       { label: "CS Subjects", value: analytics.csSubjects.overallCompletionPercentage },
       { label: "Resume", value: analytics.resume.uploaded ? 100 : 0 },
-      { label: "Mock Interviews", value: MOCK_ONLY.mockInterviewsReadiness },
-      { label: "Projects", value: MOCK_ONLY.projectsReadiness },
+      { label: "Mock Interviews", value: null, notTracked: true },
+      { label: "Projects", value: null, notTracked: true },
     ];
-    const overall = Math.round(breakdown.reduce((sum, b) => sum + b.value, 0) / breakdown.length);
+    const trackedValues = breakdown.filter((b) => !b.notTracked).map((b) => b.value);
+    const overall = Math.round(trackedValues.reduce((sum, v) => sum + v, 0) / trackedValues.length);
+
+    const today = new Date();
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+    const todaysTasks = allTasks.filter((t) => isSameDay(new Date(t.dueDate), today));
+    const todaysGoalDone = todaysTasks.filter((t) => t.isCompleted).length;
+    const todaysGoalTotal = todaysTasks.length;
 
     const stats = [
       { label: "Problems Solved", value: dsaStats.solvedCount },
-      MOCK_ONLY.todaysGoalStat,
-      MOCK_ONLY.currentStreakStat,
+      {
+        label: "Today's Goal",
+        value: todaysGoalTotal ? `${todaysGoalDone} / ${todaysGoalTotal}` : "No tasks today",
+        change: todaysGoalTotal ? `${todaysGoalTotal - todaysGoalDone} remaining` : "",
+      },
+      {
+        label: "Current Streak",
+        value: `${analytics.streak.current} day${analytics.streak.current === 1 ? "" : "s"}`,
+        change: `Personal best: ${analytics.streak.longest}`,
+      },
       { label: "Companies in Catalog", value: analytics.companies.total },
     ];
 
-    const dsaActivity = dsaStats.recentSolved.map((p) => ({
+    const dsaActivityRaw = dsaStats.recentSolved.map((p) => ({
       id: p._id,
       type: "dsa",
       text: `Solved "${p.title}" (${p.difficulty})`,
-      time: timeAgo(p.dateSolved),
+      date: p.dateSolved,
     }));
-    const activity = [...dsaActivity, ...MOCK_ONLY.nonDsaActivity].slice(0, 6);
+    const activity = [...dsaActivityRaw, ...analytics.recentActivity]
+      .sort((a, b) => new Date(b.date) - new Date(a.date))
+      .slice(0, 6)
+      .map((a) => ({ id: a.id, type: a.type, text: a.text, time: timeAgo(a.date) }));
 
-    const today = new Date();
-const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate()); // midnight, for date-only comparisons
+    const tasks = todaysTasks.map((t) => ({ id: t._id, label: t.title, done: t.isCompleted }));
 
-const tasks = allTasks
-  .filter((t) => isSameDay(new Date(t.dueDate), today))
-  .map((t) => ({ id: t._id, label: t.title, done: t.isCompleted }));
+    const sevenDaysOut = new Date(todayStart);
+    sevenDaysOut.setDate(todayStart.getDate() + 7);
 
-const sevenDaysOut = new Date(todayStart);
-sevenDaysOut.setDate(todayStart.getDate() + 7);
+    const deadlines = allTasks
+      .filter((t) => !t.isCompleted && new Date(t.dueDate) >= todayStart && new Date(t.dueDate) <= sevenDaysOut)
+      .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
+      .slice(0, 5)
+      .map((t) => ({ id: t._id, type: "task", title: t.title, date: formatDeadlineDate(t.dueDate) }));
 
-const deadlines = allTasks
-  .filter((t) => !t.isCompleted && new Date(t.dueDate) >= todayStart && new Date(t.dueDate) <= sevenDaysOut)
-  .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
-  .slice(0, 5)
-  .map((t) => ({ id: t._id, type: "task", title: t.title, date: formatDeadlineDate(t.dueDate) }));
-
-    return { user: { streak: MOCK_ONLY.streak }, readiness: { overall, breakdown }, stats, activity, tasks, deadlines };
+    return {
+      user: { streak: analytics.streak.current },
+      readiness: { overall, breakdown },
+      stats,
+      activity,
+      tasks,
+      deadlines,
+    };
   },
 };

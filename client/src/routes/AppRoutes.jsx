@@ -1,5 +1,3 @@
-//AppRoutes.jsx
-
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthLayout } from "@/components/layout/AuthLayout";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
@@ -21,6 +19,7 @@ import MockTestsPage from "@/pages/MockTestsPage";
 import MockTestDetailsPage from "@/pages/MockTestDetailsPage";
 import MockTestAttemptPage from "@/pages/MockTestAttemptPage";
 import MockTestResultPage from "@/pages/MockTestResultPage";
+import MentorPage from "@/pages/MentorPage";
 
 export function AppRoutes() {
   const location = useLocation();
@@ -52,7 +51,8 @@ export function AppRoutes() {
           <Route path={ROUTES.MOCK_TESTS} element={<MockTestsPage />} />
           <Route path={ROUTES.MOCK_TEST_DETAILS} element={<MockTestDetailsPage />} />
           <Route path={ROUTES.MOCK_TEST_ATTEMPT} element={<MockTestAttemptPage />} />
-<Route path={ROUTES.MOCK_TEST_RESULT} element={<MockTestResultPage />} />
+          <Route path={ROUTES.MOCK_TEST_RESULT} element={<MockTestResultPage />} />
+          <Route path={ROUTES.MENTOR} element={<MentorPage />} />
         </Route>
       </Route>
 

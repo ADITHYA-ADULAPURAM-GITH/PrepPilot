@@ -24,4 +24,5 @@ export const env = {
   JWT_ACCESS_EXPIRY: process.env.JWT_ACCESS_EXPIRY || "15m",
   JWT_REFRESH_EXPIRY_SHORT: process.env.JWT_REFRESH_EXPIRY_SHORT || "1d",
   JWT_REFRESH_EXPIRY_LONG: process.env.JWT_REFRESH_EXPIRY_LONG || "30d",
+  GEMINI_API_KEY: process.env.GEMINI_API_KEY || null,
 };

@@ -10,6 +10,7 @@
     "seed:mocktests": "node scripts/seedMockTests.js"
   },
   "dependencies": {
+    "@google/genai": "^2.16.0",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",

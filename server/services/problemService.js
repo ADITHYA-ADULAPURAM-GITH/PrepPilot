@@ -76,8 +76,9 @@ export const problemService = {
       problem.lastRevised = new Date();
     }
 
-    Object.assign(problem, data);
-    if (data.problemUrl === "") problem.problemUrl = null;
+    const { dateSolved, ...safeData } = data;
+    Object.assign(problem, safeData);
+    if (safeData.problemUrl === "") problem.problemUrl = null;
 
     await problem.save();
     return problem;

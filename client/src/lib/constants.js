@@ -17,6 +17,7 @@ export const ROUTES = {
   MOCK_TEST_DETAILS: "/mock-tests/:testId",
   MOCK_TEST_ATTEMPT: "/mock-tests/attempt/:attemptId",
   MOCK_TEST_RESULT: "/mock-tests/result/:attemptId",
+  MENTOR: "/mentor",
 };
 
 export const AUTH_TOKEN_KEY = "preppilot_access_token";

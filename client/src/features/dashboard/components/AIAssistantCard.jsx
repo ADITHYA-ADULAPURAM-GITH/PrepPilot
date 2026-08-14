@@ -1,7 +1,11 @@
 import { Sparkles, ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { ROUTES } from "@/lib/constants";
 
 export function AIAssistantCard() {
+  const navigate = useNavigate();
+
   return (
     <div className="glass relative overflow-hidden rounded-2xl p-6">
       <div
@@ -19,11 +23,10 @@ export function AIAssistantCard() {
           Stuck on a DSA concept, need mock interview questions, or want your resume reviewed? Your AI assistant
           knows your progress and can help right now.
         </p>
-        <Button variant="secondary" className="mt-4 w-full" disabled>
+        <Button variant="secondary" className="mt-4 w-full" onClick={() => navigate(ROUTES.MENTOR)}>
           Ask PrepPilot AI
           <ArrowRight className="size-3.5" />
         </Button>
-        <p className="mt-2 text-center text-[11px] text-text-faint">Coming in a later feature</p>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { LogOut, Bell } from "lucide-react";
+import { LogOut, Bell, Menu } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 
@@ -11,14 +11,23 @@ function initials(name = "") {
     .toUpperCase();
 }
 
-export function Topbar({ title = "Dashboard" }) {
+export function Topbar({ title = "Dashboard", onMenuClick }) {
   const { user, logout } = useAuth();
 
   return (
-    <header className="flex h-16 items-center justify-between border-b border-border px-6">
-      <h1 className="font-display text-[15px] font-semibold text-text">{title}</h1>
-
+    <header className="flex h-16 items-center justify-between border-b border-border px-4 sm:px-6">
       <div className="flex items-center gap-3">
+        <button
+          className="flex size-8 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-white/[0.05] hover:text-text md:hidden"
+          aria-label="Open menu"
+          onClick={onMenuClick}
+        >
+          <Menu className="size-[18px]" />
+        </button>
+        <h1 className="font-display text-[15px] font-semibold text-text">{title}</h1>
+      </div>
+
+      <div className="flex items-center gap-2 sm:gap-3">
         <button
           className="flex size-8 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-white/[0.05] hover:text-text"
           aria-label="Notifications"
@@ -26,7 +35,7 @@ export function Topbar({ title = "Dashboard" }) {
           <Bell className="size-[17px]" />
         </button>
 
-        <div className="mx-1 h-5 w-px bg-border" />
+        <div className="mx-1 hidden h-5 w-px bg-border sm:block" />
 
         <div className="flex items-center gap-2.5">
           <div className="flex size-8 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent font-display text-[11.5px] font-semibold text-white">

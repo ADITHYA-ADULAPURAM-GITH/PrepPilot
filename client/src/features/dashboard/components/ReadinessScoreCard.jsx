@@ -13,9 +13,16 @@ export function ReadinessScoreCard({ overall, breakdown }) {
         <ReadinessRing size={168} value={overall} showLabel={false} />
 
         <div className="w-full flex-1 space-y-3.5">
-          {breakdown.map((item) => (
-            <ProgressBar key={item.label} value={item.value} label={item.label} showLabel />
-          ))}
+          {breakdown.map((item) =>
+            item.notTracked ? (
+              <div key={item.label} className="flex items-center justify-between">
+                <span className="text-[13px] text-text-muted">{item.label}</span>
+                <span className="text-[13px] text-text-faint">Not tracked yet</span>
+              </div>
+            ) : (
+              <ProgressBar key={item.label} value={item.value} label={item.label} showLabel />
+            )
+          )}
         </div>
       </div>
     </Card>
