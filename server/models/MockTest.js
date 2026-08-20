@@ -28,6 +28,17 @@ const mockTestSchema = new mongoose.Schema(
       trim: true,
       default: null,
     },
+    // V2 Step 3 — topic-gating: optional link to the Topic this test
+    // covers. When set, a user must have completed that topic
+    // (UserTopicProgress.completed === true) before they're allowed to
+    // start an attempt — enforced in mockTestService. Left null for
+    // general-purpose tests (Aptitude, broad DSA, company rounds, etc.)
+    // which stay fully open, exactly as before this change.
+    topic: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Topic",
+      default: null,
+    },
     difficulty: {
       type: String,
       enum: ["Easy", "Medium", "Hard"],

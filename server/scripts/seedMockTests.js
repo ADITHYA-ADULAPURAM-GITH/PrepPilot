@@ -3,6 +3,14 @@
 // so re-running this after editing CATALOG below updates existing docs
 // instead of duplicating them.
 //
+// V2 Step 3 addition: the "DBMS Indexing Practice Test" entry carries a
+// `topicSlug` marker (stripped before writing to Mongo) that this
+// script resolves to the matching Topic._id by first resolving the
+// "dbms" Subject and then the "indexing" Topic scoped to that subject.
+// A topic-gated pilot test must never be seeded ungated by accident —
+// if either lookup fails, the seed aborts entirely rather than falling
+// back to an open test.
+//
 // Usage:  node scripts/seedMockTests.js   (from the server/ directory)
 
 import "dotenv/config";
@@ -10,6 +18,8 @@ import mongoose from "mongoose";
 import { env } from "../config/env.js";
 import { MockTest } from "../models/MockTest.js";
 import { Question } from "../models/Question.js";
+import { Subject } from "../models/Subject.js";
+import { Topic } from "../models/Topic.js";
 
 const CATALOG = [
   {
@@ -642,14 +652,110 @@ const CATALOG = [
       },
     ],
   },
+  {
+    // V2 Step 3 pilot — topic-gated test, linked via topicSlug below to
+    // the DBMS → Indexing topic seeded in Step 1. Kept deliberately
+    // small/focused rather than reusing or expanding "SQL Query
+    // Mastery" (which is a general SQL test, not an Indexing-specific
+    // one) — this avoids duplicating that test's content.
+    //
+    // Assumption: MockTest.category has no "DBMS" enum value, so this
+    // uses "SQL" as the closest existing fit. Change the enum and this
+    // value together if a dedicated category is preferred later.
+    title: "DBMS Indexing Practice Test",
+    description: "Focused practice test on database indexing — B-Trees, clustered vs. non-clustered indexes, and query optimization trade-offs.",
+    category: "SQL",
+    difficulty: "Medium",
+    durationMinutes: 15,
+    companyName: null,
+    topicSlug: "indexing",
+    questions: [
+      {
+        questionText: "What is the primary benefit of a clustered index?",
+        options: [
+          "It stores data rows in memory only",
+          "It defines the physical order in which data rows are stored on disk",
+          "It removes the need for a primary key",
+          "It always improves INSERT performance",
+        ],
+        correctOptionIndex: 1,
+        explanation: "A clustered index determines the physical storage order of table rows — a table can have only one.",
+      },
+      {
+        questionText: "Which index type is typically used by default in most relational databases for standard lookups and range queries?",
+        options: ["Hash index", "B-Tree index", "Bitmap index", "Full-text index"],
+        correctOptionIndex: 1,
+        explanation: "B-Tree indexes support both equality and range lookups efficiently, making them the default choice in most RDBMSs.",
+      },
+      {
+        questionText: "What is a potential downside of adding many indexes to a table?",
+        options: [
+          "Faster SELECT queries only",
+          "Slower INSERT/UPDATE/DELETE due to index maintenance overhead",
+          "Reduced storage usage",
+          "Guaranteed faster JOINs always",
+        ],
+        correctOptionIndex: 1,
+        explanation: "Every write must also update each index on the table, so more indexes mean more write overhead.",
+      },
+      {
+        questionText: "What does a 'covering index' mean?",
+        options: [
+          "An index that covers all tables in a database",
+          "An index that includes all columns needed by a query, avoiding a lookup back to the table",
+          "An index that hides sensitive columns",
+          "An index automatically created by the database",
+        ],
+        correctOptionIndex: 1,
+        explanation: "A covering index lets the database satisfy a query entirely from the index itself, without touching the underlying table.",
+      },
+      {
+        questionText: "When would a full table scan be preferred by the query planner over using an available index?",
+        options: [
+          "Never, indexes are always faster",
+          "When the query is expected to return a large fraction of the table's rows",
+          "When the table has fewer than 2 columns",
+          "When the index is on the primary key",
+        ],
+        correctOptionIndex: 1,
+        explanation: "If a large portion of rows will be read anyway, the overhead of index lookups can exceed the cost of a sequential scan.",
+      },
+    ],
+  },
 ];
+
+async function resolveIndexingTopicId() {
+  const subject = await Subject.findOne({ slug: "dbms" });
+  if (!subject) {
+    throw new Error(
+      'Seed aborted: could not find Subject with slug "dbms". The topic-gated pilot test ' +
+        "must never be seeded ungated — fix the subject slug or seed the DBMS subject first, then re-run."
+    );
+  }
+
+  const topic = await Topic.findOne({ subject: subject._id, slug: "indexing" });
+  if (!topic) {
+    throw new Error(
+      'Seed aborted: could not find Topic with slug "indexing" under the "dbms" Subject. The ' +
+        "topic-gated pilot test must never be seeded ungated — run seedTopicContent.js first, then re-run."
+    );
+  }
+
+  return topic._id;
+}
 
 async function seed() {
   await mongoose.connect(env.MONGO_URI);
   console.log("Connected to MongoDB for seeding...");
 
+  const indexingTopicId = await resolveIndexingTopicId();
+
   for (const testData of CATALOG) {
-    const { questions, ...testFields } = testData;
+    const { questions, topicSlug, ...testFields } = testData;
+
+    if (topicSlug === "indexing") {
+      testFields.topic = indexingTopicId;
+    }
 
     const test = await MockTest.findOneAndUpdate(
       { title: testFields.title },
@@ -671,7 +777,8 @@ async function seed() {
     }));
     await Question.insertMany(questionDocs);
 
-    console.log(`Seeded "${test.title}" (${testFields.category}) with ${questions.length} questions`);
+    const gatingNote = testFields.topic ? " [topic-gated]" : "";
+    console.log(`Seeded "${test.title}" (${testFields.category}) with ${questions.length} questions${gatingNote}`);
   }
 
   console.log("Seeding complete.");

@@ -3,12 +3,12 @@ import { ApiResponse } from "../utils/apiResponse.js";
 import { mockTestService } from "../services/mockTestService.js";
 
 export const listMockTests = asyncHandler(async (req, res) => {
-  const { tests, pagination } = await mockTestService.list(req.query);
+  const { tests, pagination } = await mockTestService.list(req.query, req.user._id);
   res.status(200).json(new ApiResponse(200, { tests, pagination }, "OK"));
 });
 
 export const getMockTest = asyncHandler(async (req, res) => {
-  const test = await mockTestService.getById(req.params.id);
+  const test = await mockTestService.getById(req.params.id, req.user._id);
   res.status(200).json(new ApiResponse(200, { test }, "OK"));
 });
 

@@ -2,10 +2,11 @@ import mongoose from "mongoose";
 import { MockTest } from "../models/MockTest.js";
 import { Question } from "../models/Question.js";
 import { TestAttempt } from "../models/TestAttempt.js";
+import { UserTopicProgress } from "../models/UserTopicProgress.js";
 import { ApiError } from "../utils/apiResponse.js";
 
 export const mockTestService = {
-  async list(query) {
+  async list(query, userId) {
     const { category, difficulty, page, limit } = query;
 
     const filter = { isActive: true };
@@ -15,22 +16,30 @@ export const mockTestService = {
     const skip = (page - 1) * limit;
 
     const [tests, total] = await Promise.all([
-      MockTest.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
+      MockTest.find(filter)
+        .populate("topic", "title")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
       MockTest.countDocuments(filter),
     ]);
 
-    return { tests, pagination: { page, limit, total, pages: Math.ceil(total / limit) } };
+    const completedTopicIds = await this._getCompletedTopicIds(userId, tests);
+    const annotated = tests.map((test) => this._withEligibility(test, completedTopicIds));
+
+    return { tests: annotated, pagination: { page, limit, total, pages: Math.ceil(total / limit) } };
   },
 
   // Test detail for the "about to start" screen — question count and
   // metadata only, never the questions themselves (those are only
   // revealed once an attempt exists, via getAttemptQuestions below).
-  async getById(testId) {
-    const test = await MockTest.findOne({ _id: testId, isActive: true });
+  async getById(testId, userId) {
+    const test = await MockTest.findOne({ _id: testId, isActive: true }).populate("topic", "title");
     if (!test) {
       throw new ApiError(404, "Mock test not found");
     }
-    return test;
+    const completedTopicIds = await this._getCompletedTopicIds(userId, [test]);
+    return this._withEligibility(test, completedTopicIds);
   },
 
   async startAttempt(userId, testId) {
@@ -40,6 +49,20 @@ export const mockTestService = {
     }
     if (test.totalQuestions === 0) {
       throw new ApiError(400, "This test has no questions yet");
+    }
+
+    // V2 Step 3 — topic-gating: server-side enforcement, independent of
+    // whatever the frontend shows. A test with no `topic` set is
+    // ungated and behaves exactly as before this change.
+    if (test.topic) {
+      const progress = await UserTopicProgress.findOne({
+        user: userId,
+        topic: test.topic,
+        completed: true,
+      });
+      if (!progress) {
+        throw new ApiError(403, "Complete the linked topic before starting this mock test.");
+      }
     }
 
     return TestAttempt.create({
@@ -154,5 +177,39 @@ export const mockTestService = {
       throw new ApiError(404, "Attempt not found");
     }
     return attempt;
+  },
+
+  // --- V2 Step 3 helpers (topic-gating) -------------------------------
+
+  // Given a list of (possibly topic-populated) MockTest docs, returns
+  // the Set of topic-id strings the user has completed, scoped only to
+  // the topics actually referenced by those tests.
+  async _getCompletedTopicIds(userId, tests) {
+    const topicIds = tests.filter((t) => t.topic).map((t) => t.topic._id.toString());
+    if (topicIds.length === 0) {
+      return new Set();
+    }
+    const progress = await UserTopicProgress.find({
+      user: userId,
+      topic: { $in: topicIds },
+      completed: true,
+    }).select("topic");
+    return new Set(progress.map((p) => p.topic.toString()));
+  },
+
+  // Converts a MockTest doc to a plain object with isLocked/lockedReason
+  // added. Tests with no `topic` are always unlocked — this is the
+  // guarantee that existing, ungated tests behave exactly as before.
+  _withEligibility(test, completedTopicIds) {
+    const obj = test.toObject();
+    if (!obj.topic) {
+      obj.isLocked = false;
+      obj.lockedReason = null;
+      return obj;
+    }
+    const isCompleted = completedTopicIds.has(obj.topic._id.toString());
+    obj.isLocked = !isCompleted;
+    obj.lockedReason = isCompleted ? null : `Complete "${obj.topic.title}" to unlock this test.`;
+    return obj;
   },
 };
