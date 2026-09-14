@@ -1,7 +1,7 @@
-import fs from "fs";
 import path from "path";
 import { PDFParse } from "pdf-parse";
 import mammoth from "mammoth";
+import { Resume } from "../models/Resume.js";
 import { ApiError } from "../utils/apiResponse.js";
 
 // Deterministic-only module: text extraction and structural detection.
@@ -32,9 +32,7 @@ function withTimeout(promise, ms, message) {
   ]);
 }
 
-async function extractFromPdf(absolutePath) {
-  const buffer = fs.readFileSync(absolutePath);
-
+async function extractFromPdfBuffer(buffer) {
   // pdf-parse v2 (2.x) replaced the v1 callable default export with a
   // named PDFParse class: construct it with the buffer, call getText(),
   // then destroy() to release the underlying worker/document resources.
@@ -57,10 +55,10 @@ async function extractFromPdf(absolutePath) {
   }
 }
 
-async function extractFromDocx(absolutePath) {
+async function extractFromDocxBuffer(buffer) {
   try {
     const result = await withTimeout(
-      mammoth.extractRawText({ path: absolutePath }),
+      mammoth.extractRawText({ buffer }),
       EXTRACT_TIMEOUT_MS,
       "This Word document took too long to read. It may be corrupted."
     );
@@ -72,26 +70,28 @@ async function extractFromDocx(absolutePath) {
 }
 
 /**
- * Extracts raw text from the resume file already stored on disk.
+ * Extracts raw text from the resume file stored on the Resume document
+ * (fileData is select: false, so it's re-fetched here explicitly).
  * The returned string is transient — callers must use it in-memory for
  * the current request only and must NOT persist it anywhere.
  */
 export async function extractResumeText(resume) {
-  const absolutePath = path.join(process.cwd(), resume.filePath);
-  if (!fs.existsSync(absolutePath)) {
+  const withBytes = await Resume.findById(resume._id).select("+fileData");
+  if (!withBytes || !withBytes.fileData || withBytes.fileData.length === 0) {
     throw new ApiError(404, "Resume file is missing on the server");
   }
+  const buffer = withBytes.fileData;
 
-  const ext = path.extname(resume.fileName || absolutePath).toLowerCase();
+  const ext = path.extname(resume.fileName || "").toLowerCase();
   let text;
 
   if (resume.mimeType === "application/pdf" || ext === ".pdf") {
-    text = await extractFromPdf(absolutePath);
+    text = await extractFromPdfBuffer(buffer);
   } else if (
     resume.mimeType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
     ext === ".docx"
   ) {
-    text = await extractFromDocx(absolutePath);
+    text = await extractFromDocxBuffer(buffer);
   } else if (resume.mimeType === "application/msword" || ext === ".doc") {
     // Legacy binary .doc isn't reliably parseable by mammoth (docx-only).
     throw new ApiError(

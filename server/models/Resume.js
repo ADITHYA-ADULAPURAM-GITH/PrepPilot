@@ -1,8 +1,5 @@
 import mongoose from "mongoose";
 
-// v1 scope: one active resume per user, no version history.
-// "Replace" means the existing file + doc get overwritten, not a new
-// version appended — Version Management is explicitly future scope.
 const resumeSchema = new mongoose.Schema(
   {
     user: {
@@ -18,11 +15,11 @@ const resumeSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    filePath: {
-      // path relative to server root, e.g. "uploads/resumes/<generatedName>.pdf"
-      // stored relative (not absolute) so it survives moving the project directory
-      type: String,
+    fileData: {
+      // raw file bytes
+      type: Buffer,
       required: true,
+      select: false, // never loaded on normal finds; opt in explicitly where the bytes are actually needed
     },
     fileSize: {
       // bytes, as reported by multer
