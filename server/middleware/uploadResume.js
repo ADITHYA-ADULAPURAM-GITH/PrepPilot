@@ -1,14 +1,25 @@
 import multer from "multer";
+import path from "path";
 import { ApiError } from "../utils/apiResponse.js";
+
+const ALLOWED_EXTENSIONS = new Set([".pdf", ".doc", ".docx"]);
 
 const ALLOWED_MIME_TYPES = new Set([
   "application/pdf",
   "application/msword",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/octet-stream",
 ]);
 
 function fileFilter(req, file, cb) {
-  if (!ALLOWED_MIME_TYPES.has(file.mimetype)) {
+  const extension = path.extname(file.originalname || "").toLowerCase();
+
+  const validExtension = ALLOWED_EXTENSIONS.has(extension);
+  const validMimeType =
+    ALLOWED_MIME_TYPES.has(file.mimetype) ||
+    !file.mimetype;
+
+  if (!validExtension || !validMimeType) {
     return cb(
       new ApiError(
         400,
