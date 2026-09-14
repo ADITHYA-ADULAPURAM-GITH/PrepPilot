@@ -84,7 +84,7 @@ export const dashboardApi = {
       .filter((t) => !t.isCompleted && new Date(t.dueDate) >= todayStart && new Date(t.dueDate) <= sevenDaysOut)
       .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
       .slice(0, 5)
-      .map((t) => ({ id: t._id, type: "task", title: t.title, date: formatDeadlineDate(t.dueDate) }));
+      .map((t) => ({ id: t._id, type: t.category, title: t.title, date: formatDeadlineDate(t.dueDate) }));
 
     return {
       user: { streak: analytics.streak.current },

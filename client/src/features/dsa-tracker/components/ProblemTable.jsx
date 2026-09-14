@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { DifficultyBadge } from "@/features/dsa-tracker/components/DifficultyBadge";
 import { StatusBadge } from "@/features/dsa-tracker/components/StatusBadge";
 import { ProblemActions } from "@/features/dsa-tracker/components/ProblemActions";
@@ -22,32 +23,62 @@ export function ProblemTable({ problems }) {
           </tr>
         </thead>
         <tbody>
-          {problems.map((problem) => (
-            <tr
-              key={problem._id}
-              className="border-b border-border text-[13.5px] transition-colors last:border-0 hover:bg-white/[0.015]"
-            >
-              <td className="px-4 py-3">
-                <p className="font-medium text-text">{problem.title}</p>
-                <p className="text-[12px] text-text-faint">{problem.platform || "—"}</p>
-              </td>
-              <td className="px-4 py-3 text-text-muted">{problem.topic}</td>
-              <td className="px-4 py-3">
-                <DifficultyBadge difficulty={problem.difficulty} />
-              </td>
-              <td className="px-4 py-3">
-                <StatusBadge status={problem.status} />
-              </td>
-              <td className="px-4 py-3 font-mono text-[12.5px] text-text-muted">
-                {formatDate(problem.dateSolved)}
-              </td>
-              <td className="px-4 py-3">
-                <div className="flex justify-end">
-                  <ProblemActions problem={problem} />
-                </div>
-              </td>
-            </tr>
-          ))}
+          {problems.map((problem) => {
+            const workspaceId = problem.problemBankRef;
+
+            return (
+              <tr
+                key={problem._id}
+                className="border-b border-border text-[13.5px] transition-colors last:border-0 hover:bg-white/[0.015]"
+              >
+                <td className="px-4 py-3">
+                  {workspaceId ? (
+                    <Link
+                      to={`/dsa-tracker/${workspaceId}`}
+                      aria-label={`Open ${problem.title} in workspace`}
+                      className="font-medium text-text hover:underline"
+                    >
+                      {problem.title}
+                    </Link>
+                  ) : (
+                    <p className="font-medium text-text">{problem.title}</p>
+                  )}
+                  <p className="text-[12px] text-text-faint">{problem.platform || "—"}</p>
+                </td>
+                <td className="px-4 py-3 text-text-muted">{problem.topic}</td>
+                <td className="px-4 py-3">
+                  <DifficultyBadge difficulty={problem.difficulty} />
+                </td>
+                <td className="px-4 py-3">
+                  <StatusBadge status={problem.status} />
+                </td>
+                <td className="px-4 py-3 font-mono text-[12.5px] text-text-muted">
+                  {formatDate(problem.dateSolved)}
+                </td>
+                <td className="px-4 py-3">
+                  <div className="flex items-center justify-end gap-2">
+                    {workspaceId ? (
+                      <Link
+                        to={`/dsa-tracker/${workspaceId}`}
+                        aria-label={`Solve ${problem.title}`}
+                        className="rounded-lg border border-border px-3 py-1.5 text-[12.5px] font-medium text-text transition-colors hover:bg-white/[0.04]"
+                      >
+                        Solve
+                      </Link>
+                    ) : (
+                      <span
+                        className="cursor-not-allowed rounded-lg border border-border px-3 py-1.5 text-[12.5px] font-medium text-text-faint opacity-50"
+                        title="Workspace not available for this problem yet"
+                      >
+                        Solve
+                      </span>
+                    )}
+                    <ProblemActions problem={problem} />
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

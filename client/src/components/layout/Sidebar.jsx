@@ -65,18 +65,29 @@ function SidebarContent({ onNavigate }) {
       </nav>
 
       <div className="border-t border-border p-3">
-        <div className="flex items-center gap-2.5 rounded-lg bg-gradient-to-br from-primary-muted to-accent-muted px-3 py-2.5">
-          <Sparkles className="size-4 text-accent" />
-          <span className="text-[12.5px] font-medium text-text-muted">PrepPilot AI</span>
-        </div>
-      </div>
+  <NavLink
+    to={ROUTES.MENTOR}
+    onClick={onNavigate}
+    className={({ isActive }) =>
+      cn(
+        "flex items-center gap-2.5 rounded-lg bg-gradient-to-br from-primary-muted to-accent-muted px-3 py-2.5 transition-all duration-200 shadow-[var(--ai-pill-shadow)] border border-[var(--ai-pill-border)]",
+        isActive
+          ? "ring-1 ring-primary/60"
+          : "hover:brightness-110 active:scale-[0.99]"
+      )
+    }
+  >
+    <Sparkles className="size-4 text-accent" />
+    <span className="text-[12.5px] font-medium text-text-muted">PrepPilot AI</span>
+  </NavLink>
+</div>
     </>
   );
 }
 
 export function Sidebar({ isMobileOpen = false, onMobileClose }) {
-  // Lock background scroll while the drawer is open — required by spec
-  // item 1 ("prevent the page behind from behaving awkwardly").
+  // Lock background scroll while thedrawer is open — required by spec
+  // item 1 ("prevent the page behindfrom behaving awkwardly").
   useEffect(() => {
     document.body.style.overflow = isMobileOpen ? "hidden" : "";
     return () => {

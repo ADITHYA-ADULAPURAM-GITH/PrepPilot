@@ -7,5 +7,6 @@ const router = Router();
 router.use(requireAuth);
 
 router.get("/overview", analyticsController.getOverview);
+router.get("/next-activity", analyticsController.getNextActivity);
 
 export default router;

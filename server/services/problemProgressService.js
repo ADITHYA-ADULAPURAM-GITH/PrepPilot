@@ -3,6 +3,7 @@ import { ProblemAttempt } from "../models/ProblemAttempt.js";
 import { ProblemBank } from "../models/ProblemBank.js";
 import { ApiError } from "../utils/apiResponse.js";
 import { runVisible, runAll, Judge0TimeoutError, Judge0UnavailableError } from "./executionService.js";
+import { notificationService } from "./notificationService.js";
 
 const DEFAULT_LIMIT = 20;
 
@@ -10,28 +11,6 @@ async function findOwnedProgress(userId, problemId) {
   const progress = await ProblemProgress.findOne({ user: userId, problem: problemId });
   if (!progress) throw new ApiError(404, "Problem not found or not assigned to you");
   return progress;
-}
-
-// Auto-creates ProblemProgress on first workspace open. Never mutates an
-// existing doc ($setOnInsert only touches insert-time fields). Race-safe:
-// if two concurrent "open workspace" calls both attempt the upsert, the
-// unique (user, problem) index lets only one insert win; the loser catches
-// the duplicate-key error and re-reads instead of failing — same pattern
-// already used in problemSelectionService.js for concurrent /select calls.
-async function getOrCreateProgress(userId, problemId) {
-  try {
-    return await ProblemProgress.findOneAndUpdate(
-      { user: userId, problem: problemId },
-      { $setOnInsert: { user: userId, problem: problemId } },
-      { new: true, upsert: true, setDefaultsOnInsert: true }
-    );
-  } catch (err) {
-    if (err.code === 11000) {
-      const existing = await ProblemProgress.findOne({ user: userId, problem: problemId });
-      if (existing) return existing;
-    }
-    throw err;
-  }
 }
 
 function handleExecutionError(err) {
@@ -80,10 +59,10 @@ export const problemProgressService = {
   },
 
   async getWorkspace(userId, problemId) {
-    const problem = await ProblemBank.findById(problemId);
-    if (!problem) throw new ApiError(404, "Problem not found");
+    await findOwnedProgress(userId, problemId);
 
-    await getOrCreateProgress(userId, problemId);
+    const problem = await ProblemBank.findById(problemId);
+    if (!problem) throw new ApiError(404, "Problem not found or not assigned to you");
 
     return {
       problem: {
@@ -149,8 +128,22 @@ export const problemProgressService = {
       nextStatus = "in-progress";
     }
 
+    // Captured BEFORE the status write below, and compared against the
+    // target status — this is what guarantees a notification only fires
+    // on the actual assigned/in-progress -> solved transition, never on
+    // a repeated Accepted submission against an already-solved problem.
+    const isNewlySolved = updatedProgress.status !== "solved" && nextStatus === "solved";
+
     if (nextStatus !== updatedProgress.status) {
       await ProblemProgress.updateOne({ _id: progress._id }, { $set: { status: nextStatus } });
+    }
+
+    if (isNewlySolved) {
+      const problemDoc = await ProblemBank.findById(problemId).select("title");
+      await notificationService.createDsaMilestoneNotification(userId, {
+        problemId,
+        problemTitle: problemDoc?.title || "a problem",
+      });
     }
 
     return {

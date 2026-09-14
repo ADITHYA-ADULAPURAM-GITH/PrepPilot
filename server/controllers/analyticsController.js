@@ -1,8 +1,14 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { analyticsService } from "../services/analyticsService.js";
+import { nextActivityService } from "../services/nextActivityService.js";
 
 export const getOverview = asyncHandler(async (req, res) => {
   const overview = await analyticsService.getOverview(req.user._id);
   res.status(200).json(new ApiResponse(200, overview, "OK"));
+});
+
+export const getNextActivity = asyncHandler(async (req, res) => {
+  const activity = await nextActivityService.getNextActivity(req.user._id);
+  res.status(200).json(new ApiResponse(200, { activity }, "OK"));
 });

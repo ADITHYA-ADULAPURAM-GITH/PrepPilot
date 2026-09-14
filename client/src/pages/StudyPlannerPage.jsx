@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Plus, ListTodo } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useStudyTasks } from "@/features/study-planner/hooks/useStudyTasks";
 import { TaskItem } from "@/features/study-planner/components/TaskItem";
 import { TaskFormDialog } from "@/features/study-planner/components/TaskFormDialog";
@@ -26,7 +27,7 @@ function groupTasksByDate(tasks) {
   const groups = {};
   for (const task of tasks) {
     // dueDate is stored as a full ISO datetime; only the date portion
-    // is used as the grouping key so time-of-day never splits a task
+    // is used as the grouping key sotime-of-day never splits a task
     // into the wrong group.
     const dateKey = new Date(task.dueDate).toISOString().slice(0, 10);
     if (!groups[dateKey]) groups[dateKey] = [];
@@ -36,7 +37,7 @@ function groupTasksByDate(tasks) {
 }
 
 export default function StudyPlannerPage() {
-  const { data, isLoading, isError } = useStudyTasks({ limit: 100 });
+  const { data, isLoading, isError, refetch } = useStudyTasks({ limit: 100 });
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
 
@@ -80,6 +81,11 @@ export default function StudyPlannerPage() {
           icon={ListTodo}
           title="Couldn't load your tasks"
           description="Something went wrong talking to the server. Try refreshing the page."
+          action={
+            <Button type="button" variant="secondary" onClick={() => refetch?.()}>
+              Retry
+            </Button>
+          }
         />
       )}
 
@@ -99,9 +105,20 @@ export default function StudyPlannerPage() {
               {formatGroupLabel(dateKey)}
             </h2>
             <div className="space-y-2.5">
-              {tasks.map((task) => (
-                <TaskItem key={task._id} task={task} onEdit={handleEdit} />
-              ))}
+              <AnimatePresence initial={false}>
+                {tasks.map((task) => (
+                  <motion.div
+                    key={task._id}
+                    layout
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <TaskItem task={task} onEdit={handleEdit} />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
             </div>
           </div>
         ))}

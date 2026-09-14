@@ -4,22 +4,27 @@ import problemRoutes from "./problemRoutes.js";
 import subjectRoutes from "./subjectRoutes.js";
 import companyRoutes from "./companyRoutes.js";
 import resumeRoutes from "./resumeRoutes.js";
+import resumeAnalysisRoutes from "./resumeAnalysisRoutes.js";
 import studyTaskRoutes from "./studyTaskRoutes.js";
 import analyticsRoutes from "./analyticsRoutes.js";
 import mockTestRoutes from "./mockTestRoutes.js";
 import mentorRoutes from "./mentorRoutes.js";
-
+import problemBankRoutes from "./problemBankRoutes.js";
+import problemProgressRoutes from "./problemProgressRoutes.js";
+import notificationRoutes from "./notificationRoutes.js";
 const router = Router();
-
 router.use("/auth", authRoutes);
 router.use("/problems", problemRoutes);
 router.use("/subjects", subjectRoutes);
 router.use("/companies", companyRoutes);
 router.use("/resume", resumeRoutes);
+router.use("/resume", resumeAnalysisRoutes);
 router.use("/study-tasks", studyTaskRoutes);
 router.use("/analytics", analyticsRoutes);
 router.use("/mocktests", mockTestRoutes);
 router.use("/mentor", mentorRoutes);
+router.use("/problem-bank", problemBankRoutes);
+router.use("/problem-progress", problemProgressRoutes);
+router.use("/notifications", notificationRoutes);
 // Future domains mount here: router.use("/mocktests", mockTestRoutes); etc.
-
 export default router;

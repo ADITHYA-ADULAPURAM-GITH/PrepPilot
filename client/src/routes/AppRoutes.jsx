@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthLayout } from "@/components/layout/AuthLayout";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { ProtectedRoute, GuestRoute } from "@/routes/ProtectedRoute";
@@ -9,6 +9,7 @@ import RegisterPage from "@/pages/RegisterPage";
 import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
 import DashboardPage from "@/pages/DashboardPage";
 import DsaTrackerPage from "@/pages/DsaTrackerPage";
+import DsaWorkspacePage from "@/pages/DsaWorkspacePage";
 import CsSubjectsPage from "@/pages/CsSubjectsPage";
 import SubjectDetailsPage from "@/pages/SubjectDetailsPage";
 import CompaniesPage from "@/pages/CompaniesPage";
@@ -20,11 +21,9 @@ import MockTestDetailsPage from "@/pages/MockTestDetailsPage";
 import MockTestAttemptPage from "@/pages/MockTestAttemptPage";
 import MockTestResultPage from "@/pages/MockTestResultPage";
 import MentorPage from "@/pages/MentorPage";
+import ProfilePage from "@/pages/ProfilePage";
 
 export function AppRoutes() {
-  const location = useLocation();
-  console.log("ROUTE CHANGE →", location.pathname);
-
   return (
     <Routes>
       <Route element={<GuestRoute />}>
@@ -39,6 +38,7 @@ export function AppRoutes() {
         <Route element={<DashboardLayout />}>
           <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
           <Route path={ROUTES.DSA_TRACKER} element={<DsaTrackerPage />} />
+          <Route path={ROUTES.DSA_WORKSPACE} element={<DsaWorkspacePage />} />
           <Route path={ROUTES.CS_SUBJECTS} element={<CsSubjectsPage />} />
           <Route
             path={`${ROUTES.CS_SUBJECTS}/:subjectSlug`}
@@ -53,6 +53,7 @@ export function AppRoutes() {
           <Route path={ROUTES.MOCK_TEST_ATTEMPT} element={<MockTestAttemptPage />} />
           <Route path={ROUTES.MOCK_TEST_RESULT} element={<MockTestResultPage />} />
           <Route path={ROUTES.MENTOR} element={<MentorPage />} />
+          <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
         </Route>
       </Route>
 

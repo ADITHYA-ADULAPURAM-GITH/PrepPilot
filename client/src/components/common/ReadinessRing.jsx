@@ -20,7 +20,7 @@ export function ReadinessRing({ size = 340, value = 72 }) {
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke="rgba(255,255,255,0.06)"
+          stroke="var(--color-border)"
           strokeWidth={strokeWidth}
         />
         <motion.circle
@@ -38,8 +38,8 @@ export function ReadinessRing({ size = 340, value = 72 }) {
         />
         <defs>
           <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#5b4fe8" />
-            <stop offset="100%" stopColor="#f5b942" />
+            <stop offset="0%" style={{ stopColor: "var(--color-primary)" }} />
+            <stop offset="100%" style={{ stopColor: "var(--color-accent)" }} />
           </linearGradient>
         </defs>
       </svg>

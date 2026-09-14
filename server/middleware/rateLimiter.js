@@ -20,3 +20,15 @@ export const forgotPasswordRateLimiter = rateLimit({
   legacyHeaders: false,
   handler,
 });
+
+// Resume analysis / JD match / bullet improver each trigger a Gemini
+// call — capped independently to bound AI cost and abuse, while still
+// allowing reasonable iterative use (re-analyzing after edits, trying a
+// few different bullets).
+export const resumeAnalysisRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler,
+});

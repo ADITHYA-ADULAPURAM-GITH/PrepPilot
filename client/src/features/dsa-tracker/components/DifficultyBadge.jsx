@@ -1,11 +1,6 @@
 import { Badge } from "@/components/ui/badge";
-
-const VARIANT_MAP = {
-  Easy: "success",
-  Medium: "accent",
-  Hard: "danger",
-};
+import { DIFFICULTY_COLORS } from "@/lib/difficultyColors";
 
 export function DifficultyBadge({ difficulty }) {
-  return <Badge variant={VARIANT_MAP[difficulty] || "default"}>{difficulty}</Badge>;
+  return <Badge variant={DIFFICULTY_COLORS[difficulty]?.badge || "default"}>{difficulty}</Badge>;
 }

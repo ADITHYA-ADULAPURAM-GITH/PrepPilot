@@ -1,5 +1,6 @@
 import * as React from "react";
 import { cva } from "class-variance-authority";
+import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -9,18 +10,25 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          "bg-primary text-white hover:bg-primary-hover shadow-[0_0_0_1px_rgba(255,255,255,0.06)]",
+          "bg-primary-button text-white hover:bg-primary-button-hover shadow-[0_0_0_1px_rgba(255,255,255,0.06)]",
+
         secondary:
           "bg-white/[0.04] text-text border border-border hover:bg-white/[0.07]",
-        ghost: "text-text-muted hover:text-text hover:bg-white/[0.04]",
-        link: "text-primary hover:text-primary-hover underline-offset-4 hover:underline p-0 h-auto",
+
+        ghost:
+          "text-text-muted hover:text-text hover:bg-white/[0.04]",
+
+        link:
+          "text-primary-strong underline-offset-4 hover:underline p-0 h-auto",
       },
+
       size: {
         default: "h-10 px-4",
         sm: "h-8 px-3 text-[13px]",
         lg: "h-11 px-6 text-[15px]",
       },
     },
+
     defaultVariants: {
       variant: "primary",
       size: "default",
@@ -29,20 +37,52 @@ const buttonVariants = cva(
 );
 
 const Button = React.forwardRef(
-  ({ className, variant, size, isLoading, children, disabled, ...props }, ref) => {
+  (
+    {
+      className,
+      variant,
+      size,
+      isLoading,
+      children,
+      disabled,
+      ...props
+    },
+    ref
+  ) => {
     return (
-      <button
+      <motion.button
         ref={ref}
-        className={cn(buttonVariants({ variant, size }), className)}
+        whileTap={
+          disabled || isLoading
+            ? undefined
+            : { scale: 0.97 }
+        }
+        transition={{
+          duration: 0.15,
+        }}
+        className={cn(
+          buttonVariants({
+            variant,
+            size,
+          }),
+          className
+        )}
         disabled={disabled || isLoading}
         {...props}
       >
-        {isLoading && <Loader2 className="size-4 animate-spin" />}
+        {isLoading && (
+          <Loader2 className="size-4 animate-spin" />
+        )}
+
         {children}
-      </button>
+      </motion.button>
     );
   }
 );
+
 Button.displayName = "Button";
 
-export { Button, buttonVariants };
+export {
+  Button,
+  buttonVariants,
+};

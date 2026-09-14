@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useToggleStudyTask } from "@/features/study-planner/hooks/useToggleStudyTask";
 import { useDeleteStudyTask } from "@/features/study-planner/hooks/useDeleteStudyTask";
 
@@ -12,6 +14,7 @@ const PRIORITY_COLORS = {
 };
 
 export function TaskItem({ task, onEdit }) {
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const toggleMutation = useToggleStudyTask();
   const deleteMutation = useDeleteStudyTask();
 
@@ -19,10 +22,10 @@ export function TaskItem({ task, onEdit }) {
     toggleMutation.mutate({ id: task._id, isCompleted: !task.isCompleted });
   }
 
-  function handleDelete() {
-    if (window.confirm("Delete this task?")) {
-      deleteMutation.mutate(task._id);
-    }
+  function handleConfirmDelete() {
+    deleteMutation.mutate(task._id, {
+      onSuccess: () => setDeleteOpen(false),
+    });
   }
 
   return (
@@ -63,13 +66,32 @@ export function TaskItem({ task, onEdit }) {
           type="button"
           variant="ghost"
           size="sm"
-          onClick={handleDelete}
-          isLoading={deleteMutation.isPending}
+          onClick={() => setDeleteOpen(true)}
           className="text-red-400 hover:bg-red-500/10 hover:text-red-300"
         >
           <Trash2 className="size-3.5" />
         </Button>
       </div>
+
+      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <DialogContent
+          title="Delete this task?"
+          description={`"${task.title}" will be permanently removed. This can't be undone.`}
+        >
+          <div className="flex gap-3">
+            <Button variant="secondary" className="flex-1" onClick={() => setDeleteOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              className="flex-1 bg-danger hover:bg-danger/90"
+              isLoading={deleteMutation.isPending}
+              onClick={handleConfirmDelete}
+            >
+              Delete
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

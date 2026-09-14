@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { Resume } from "../models/Resume.js";
 import { ApiError } from "../utils/apiResponse.js";
+import { resumeAnalysisService } from "./resumeAnalysisService.js";
 
 function deleteFileIfExists(relativeFilePath) {
   const absolutePath = path.join(process.cwd(), relativeFilePath);
@@ -31,6 +32,12 @@ export const resumeService = {
       existing.fileSize = file.size;
       existing.mimeType = file.mimetype;
       await existing.save();
+
+      // The old file is gone — any analysis tied to it now describes a
+      // file that no longer exists, so it's invalidated rather than
+      // left around to look current in the UI.
+      await resumeAnalysisService.invalidateForUser(userId);
+
       return existing;
     }
 
@@ -50,6 +57,7 @@ export const resumeService = {
     }
     deleteFileIfExists(resume.filePath);
     await resume.deleteOne();
+    await resumeAnalysisService.invalidateForUser(userId);
   },
 
   async getForDownload(userId) {

@@ -10,6 +10,7 @@ import { ProblemCardList } from "@/features/dsa-tracker/components/ProblemCardLi
 import { PaginationControls } from "@/features/dsa-tracker/components/PaginationControls";
 import { LoadingSkeleton } from "@/features/dsa-tracker/components/LoadingSkeleton";
 import { EmptyState } from "@/components/common/EmptyState";
+import { Button } from "@/components/ui/button";
 
 const INITIAL_FILTERS = { topic: "", difficulty: "", status: "", search: "", page: 1 };
 
@@ -23,7 +24,7 @@ export default function DsaTrackerPage() {
     [filters, debouncedSearch]
   );
 
-  const { data, isLoading, isError } = useProblems(queryFilters);
+  const { data, isLoading, isError, refetch } = useProblems(queryFilters);
 
   const updateFilters = (patch) => setFilters((prev) => ({ ...prev, ...patch, page: 1 }));
 
@@ -53,6 +54,11 @@ export default function DsaTrackerPage() {
           icon={Code2}
           title="Couldn't load your problems"
           description="Something went wrong talking to the server. Try refreshing the page."
+          action={
+            <Button type="button" variant="secondary" onClick={() => refetch?.()}>
+              Retry
+            </Button>
+          }
         />
       )}
 

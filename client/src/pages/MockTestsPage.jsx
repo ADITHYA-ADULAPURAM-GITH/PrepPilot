@@ -1,14 +1,25 @@
 import { useMemo, useState } from "react";
-import { Search, ClipboardList } from "lucide-react";
+import { ClipboardList } from "lucide-react";
+import { motion } from "framer-motion";
 import { useMockTests } from "@/features/mock-tests/hooks/useMockTests";
 import { MockTestCard } from "@/features/mock-tests/components/MockTestCard";
 import { MockTestSkeleton } from "@/features/mock-tests/components/MockTestSkeleton";
-import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/common/EmptyState";
 
 const CATEGORY_OPTIONS = ["Aptitude", "SQL", "Python", "DSA", "Company-specific"];
 const DIFFICULTY_OPTIONS = ["Easy", "Medium", "Hard"];
+
+const gridVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.05 } },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0 },
+};
 
 export default function MockTestsPage() {
   const [category, setCategory] = useState("");
@@ -19,7 +30,7 @@ export default function MockTestsPage() {
     [category, difficulty]
   );
 
-  const { data, isLoading, isError } = useMockTests(queryFilters);
+  const { data, isLoading, isError, refetch } = useMockTests(queryFilters);
 
   const hasActiveFilters = Boolean(category || difficulty);
 
@@ -69,6 +80,11 @@ export default function MockTestsPage() {
           icon={ClipboardList}
           title="Couldn't load mock tests"
           description="Something went wrong talking to the server. Try refreshing the page."
+          action={
+            <Button type="button" variant="secondary" onClick={() => refetch?.()}>
+              Retry
+            </Button>
+          }
         />
       )}
 
@@ -83,11 +99,18 @@ export default function MockTestsPage() {
       )}
 
       {!isLoading && !isError && data?.tests?.length > 0 && (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={gridVariants}
+          className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+        >
           {data.tests.map((test) => (
-            <MockTestCard key={test._id} test={test} />
+            <motion.div key={test._id} variants={cardVariants} transition={{ duration: 0.2 }}>
+              <MockTestCard test={test} />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       )}
     </div>
   );

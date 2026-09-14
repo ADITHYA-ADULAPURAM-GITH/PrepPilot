@@ -5,26 +5,141 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
-  --color-base: #0a0a0f;
-  --color-surface: #0f0f17;
-  --color-surface-hover: #14141f;
-  --color-border: #1f1f2b;
+  /* Dark theme — default token values, used until [data-theme="light"] overrides them */
+  --color-base: #111110;
+  --color-surface: #191918;
+  --color-surface-raised: #22211f;
+  --color-surface-hover: #262421;
+  --color-border: #302e2a;
 
-  --color-primary: #5b4fe8;
-  --color-primary-hover: #6e62f2;
-  --color-primary-muted: #5b4fe81a;
+  --color-primary: #d85a30;
+  --color-primary-hover: #e36a43;
+  --color-primary-strong: #d85a30;
+  --color-primary-muted: #d85a3026;
 
   --color-accent: #f5b942;
-  --color-accent-muted: #f5b9421a;
+  --color-accent-muted: #f5b94226;
 
-  --color-success: #34d399;
+  --color-success: #819d78;
+  --color-warning: #c69a58;
   --color-danger: #f87171;
 
-  --color-text: #f5f5f7;
-  --color-text-muted: #8a8a99;
-  --color-text-faint: #55555f;
+  --color-text: #f7f4ee;
+  --color-text-muted: #aaa59c;
+  --color-text-faint: #6e695f;
 
-  --shadow-glow: 0 0 60px -12px rgba(91, 79, 232, 0.35);
+  --shadow-glow: 0 0 60px -12px rgba(216, 90, 48, 0.35);
+}
+
+:root {
+  --primary-rgb: 216, 90, 48;
+  --accent-rgb: 245, 185, 66;
+  --warning-rgb: 198, 154, 88;
+  --text-rgb: 247, 244, 238;
+
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.06);
+
+  /* Theme-aware surface tints for things like badges/pills that used to
+     be hardcoded white/[x] — those go invisible on a light surface, so
+     everything that needs a subtle "raised" tint reads off --text-rgb
+     instead, which is already light-in-dark / dark-in-light. */
+  --overlay-1: rgba(var(--text-rgb), 0.03);
+  --overlay-2: rgba(var(--text-rgb), 0.05);
+  --overlay-3: rgba(var(--text-rgb), 0.08);
+  --overlay-4: rgba(var(--text-rgb), 0.12);
+
+  /* Ambient background orb intensity — tuned for a near-black canvas.
+     Light theme overrides this much lower; three overlapping warm
+     glows at dark-mode strength read as mud on a cream background. */
+  --orb-opacity-1: 0.4;
+  --orb-opacity-2: 0.3;
+  --orb-opacity-3: 0.25;
+
+  /* Hero panel (WelcomeHero) ambient tokens — dark values below match
+     the hero's current/original rendering exactly (the old `dark:`
+     classes never actually fired, since data-theme isn't a Tailwind
+     dark selector). Light theme overrides these further down with
+     tuned, lower-alpha values so the same motif reads as a soft glow
+     instead of mud on a cream background. */
+  --hero-tint: linear-gradient(135deg, rgba(216, 90, 48, 0.07), transparent 50%, rgba(0, 0, 0, 0.18) 100%);
+  --hero-glow-1: radial-gradient(ellipse, rgba(216, 90, 48, 0.34) 0%, rgba(216, 90, 48, 0.14) 32%, transparent 70%);
+  --hero-glow-2: radial-gradient(ellipse, rgba(216, 90, 48, 0.26) 0%, rgba(190, 72, 37, 0.1) 38%, transparent 72%);
+  --hero-sun: radial-gradient(circle, rgba(255, 216, 164, 0.92) 0%, rgba(246, 170, 104, 0.55) 35%, rgba(216, 90, 48, 0.18) 62%, transparent 74%);
+  --hero-sun-opacity: 0.58;
+  --hero-topo-opacity: 0.16;
+  --hero-bottom-fade: linear-gradient(to top, rgba(0, 0, 0, 0.12), transparent);
+  --hero-left-fade: linear-gradient(to right, rgba(0, 0, 0, 0.05), transparent, transparent);
+  --hero-vlight-opacity: 0.1;
+
+  /* Card elevation — dark has none (a border alone already reads as
+     "raised" on a near-black surface); real elevation only kicks in
+     for light theme below. */
+  --shadow-card: none;
+
+  /* Subtle definition ring for badges/pills; no-op in dark. */
+  --chip-ring: none;
+
+  /* Sidebar "PrepPilot AI" pill accents; no-op in dark. */
+  --ai-pill-shadow: none;
+  --ai-pill-border: transparent;
+}
+
+/* Light theme — applied when <html data-theme="light"> */
+:root[data-theme="light"] {
+  --color-base: #f7f4ee;
+  --color-surface: #fffefb;
+  --color-surface-raised: #ffffff;
+  --color-surface-hover: #f1ecdf;
+  --color-border: #e4ded4;
+
+  --color-primary: #d85a30;
+  --color-primary-hover: #b94725;
+  --color-primary-strong: #b94725;
+  --color-primary-muted: #d85a301f;
+
+  --color-accent: #f5b942;
+  --color-accent-muted: #f5b9421f;
+
+  --color-success: #5f7f5b;
+  --color-warning: #b88945;
+  --color-danger: #f87171;
+
+  --color-text: #2b2a27;
+  --color-text-muted: #6f6b64;
+  --color-text-faint: #a39d8f;
+
+  --shadow-glow: 0 0 40px -12px rgba(216, 90, 48, 0.18);
+
+  --primary-rgb: 216, 90, 48;
+  --accent-rgb: 245, 185, 66;
+  --warning-rgb: 184, 137, 69;
+  --text-rgb: 43, 42, 39;
+
+  --glass-bg: rgba(43, 42, 39, 0.03);
+  --glass-border: rgba(43, 42, 39, 0.08);
+
+  --orb-opacity-1: 0.14;
+  --orb-opacity-2: 0.1;
+  --orb-opacity-3: 0.08;
+
+  /* --- Premium light-theme overrides (dark theme untouched above) --- */
+
+  --hero-tint: linear-gradient(135deg, rgba(216, 90, 48, 0.05), transparent 50%, rgba(43, 42, 39, 0.04) 100%);
+  --hero-glow-1: radial-gradient(ellipse, rgba(216, 90, 48, 0.16) 0%, rgba(216, 90, 48, 0.05) 32%, transparent 70%);
+  --hero-glow-2: radial-gradient(ellipse, rgba(245, 185, 66, 0.18) 0%, rgba(216, 90, 48, 0.05) 38%, transparent 72%);
+  --hero-sun: radial-gradient(circle, rgba(255, 239, 214, 0.95) 0%, rgba(245, 185, 66, 0.45) 35%, rgba(216, 90, 48, 0.14) 62%, transparent 74%);
+  --hero-sun-opacity: 0.5;
+  --hero-topo-opacity: 0.1;
+  --hero-bottom-fade: linear-gradient(to top, rgba(43, 42, 39, 0.05), transparent);
+  --hero-left-fade: linear-gradient(to right, rgba(43, 42, 39, 0.03), transparent, transparent);
+  --hero-vlight-opacity: 0.14;
+
+  --shadow-card: 0 1px 2px rgba(43, 42, 39, 0.04), 0 8px 24px -4px rgba(43, 42, 39, 0.08);
+  --chip-ring: 0 0 0 1px rgba(43, 42, 39, 0.06);
+
+  --ai-pill-shadow: 0 1px 2px rgba(43, 42, 39, 0.04), 0 6px 16px -4px rgba(216, 90, 48, 0.18);
+  --ai-pill-border: rgba(216, 90, 48, 0.18);
 }
 
 @layer base {
@@ -37,6 +152,7 @@
     color: var(--color-text);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
   ::selection {
@@ -52,13 +168,13 @@
 
 @layer utilities {
   .glass {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--glass-bg);
     backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--glass-border);
   }
 
   .text-gradient {
-    background: linear-gradient(135deg, #ffffff 0%, #a89bff 100%);
+    background: linear-gradient(135deg, var(--color-text) 0%, var(--color-primary-hover) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -80,6 +196,19 @@
 
   .animate-dialog-in {
     animation: dialog-in 150ms ease-out;
+  }
+
+  @keyframes orb-drift-a {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    50%      { transform: translate3d(6%, 8%, 0) scale(1.15); }
+  }
+  @keyframes orb-drift-b {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1.05); }
+    50%      { transform: translate3d(-6%, -10%, 0) scale(0.9); }
+  }
+  @keyframes orb-drift-c {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    50%      { transform: translate3d(-8%, -6%, 0) scale(1.2); }
   }
 }
 

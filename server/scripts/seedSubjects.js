@@ -1,10 +1,12 @@
-// One-time/idempotent catalog seeder. Safe to re-run: subjects and
-// topics are upserted by slug, so running this again after editing
-// CATALOG below (adding a topic, renaming one, adding new fields once
-// they exist on the schema) updates existing docs rather than
-// duplicating them.
+// Idempotent CS Subjects catalog seeder.
 //
-// Usage:  npm run seed   (from the server/ directory)
+// Safe to re-run:
+// - subjects are upserted by slug
+// - topics are upserted by (subject, slug)
+// - existing documents are updated rather than duplicated
+//
+// Usage:
+//   node scripts/seedSubjects.js
 
 import "dotenv/config";
 import mongoose from "mongoose";
@@ -37,6 +39,7 @@ const CATALOG = [
       "Disk Scheduling",
     ],
   },
+
   {
     name: "DBMS",
     icon: "Database",
@@ -53,6 +56,7 @@ const CATALOG = [
       "Query Processing",
     ],
   },
+
   {
     name: "Computer Networks",
     icon: "Network",
@@ -69,6 +73,7 @@ const CATALOG = [
       "Sockets",
     ],
   },
+
   {
     name: "OOP",
     icon: "Box",
@@ -85,6 +90,7 @@ const CATALOG = [
       "SOLID Principles",
     ],
   },
+
   {
     name: "SQL",
     icon: "Table",
@@ -101,11 +107,32 @@ const CATALOG = [
       "Query Optimization",
     ],
   },
+
+  // Placement aptitude + reasoning
+  {
+    name: "Aptitude & Logical Reasoning",
+    icon: "Brain",
+    topics: [
+      "Number System",
+      "Percentages",
+      "Profit & Loss",
+      "Ratio & Proportion",
+      "Averages",
+      "Time, Work & Distance",
+      "Probability & Permutations",
+      "Data Interpretation",
+      "Logical Reasoning",
+      "Puzzles & Seating Arrangement",
+    ],
+  },
 ];
 
 async function seed() {
   await mongoose.connect(env.MONGO_URI);
   console.log("Connected to MongoDB for seeding...");
+
+  let totalSubjects = 0;
+  let totalTopics = 0;
 
   for (let i = 0; i < CATALOG.length; i++) {
     const { name, icon, topics } = CATALOG[i];
@@ -113,24 +140,55 @@ async function seed() {
 
     const subject = await Subject.findOneAndUpdate(
       { slug },
-      { name, slug, icon, order: i },
-      { upsert: true, new: true, setDefaultsOnInsert: true }
+      {
+        name,
+        slug,
+        icon,
+        order: i,
+      },
+      {
+        upsert: true,
+        new: true,
+        setDefaultsOnInsert: true,
+      }
     );
+
+    totalSubjects++;
 
     for (let t = 0; t < topics.length; t++) {
       const title = topics[t];
       const topicSlug = slugify(title);
+
       await Topic.findOneAndUpdate(
-        { subject: subject._id, slug: topicSlug },
-        { subject: subject._id, title, slug: topicSlug, order: t },
-        { upsert: true, new: true, setDefaultsOnInsert: true }
+        {
+          subject: subject._id,
+          slug: topicSlug,
+        },
+        {
+          subject: subject._id,
+          title,
+          slug: topicSlug,
+          order: t,
+        },
+        {
+          upsert: true,
+          new: true,
+          setDefaultsOnInsert: true,
+        }
       );
+
+      totalTopics++;
     }
 
-    console.log(`Seeded "${name}" with ${topics.length} topics`);
+    console.log(
+      `Seeded "${name}" with ${topics.length} topics`
+    );
   }
 
-  console.log("Seeding complete.");
+  console.log(
+    `\nSeeding complete. Subjects: ${totalSubjects}, Topics: ${totalTopics}`
+  );
+
   await mongoose.disconnect();
   process.exit(0);
 }

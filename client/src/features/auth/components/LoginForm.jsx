@@ -21,7 +21,11 @@ export function LoginForm() {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: "", password: "", rememberMe: true },
+    defaultValues: {
+      email: "",
+      password: "",
+      rememberMe: true,
+    },
   });
 
   const onSubmit = (values) => {
@@ -30,12 +34,22 @@ export function LoginForm() {
 
   return (
     <div>
-      <h2 className="font-display text-2xl font-semibold text-text">Welcome back</h2>
-      <p className="mt-1.5 text-[14px] text-text-muted">Sign in to pick up your prep where you left off.</p>
+      <h2 className="font-display text-2xl font-semibold text-text">
+        Welcome back
+      </h2>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-4" noValidate>
+      <p className="mt-1.5 text-[14px] text-text-muted">
+        Sign in to pick up your prep where you left off.
+      </p>
+
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="mt-8 space-y-4"
+        noValidate
+      >
         <div>
           <Label htmlFor="email">Email</Label>
+
           <Input
             id="email"
             type="email"
@@ -44,16 +58,22 @@ export function LoginForm() {
             error={!!errors.email}
             {...register("email")}
           />
+
           <FieldError message={errors.email?.message} />
         </div>
 
         <div>
           <div className="flex items-center justify-between">
             <Label htmlFor="password">Password</Label>
-            <Link to={ROUTES.FORGOT_PASSWORD} className="mb-1.5 text-[12.5px] text-primary hover:text-primary-hover">
+
+            <Link
+              to={ROUTES.FORGOT_PASSWORD}
+              className="mb-1.5 text-[12.5px] text-primary-strong hover:underline"
+            >
               Forgot password?
             </Link>
           </div>
+
           <div className="relative">
             <Input
               id="password"
@@ -64,16 +84,24 @@ export function LoginForm() {
               className="pr-10"
               {...register("password")}
             />
+
             <button
               type="button"
               onClick={() => setShowPassword((s) => !s)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-text-faint hover:text-text-muted"
               tabIndex={-1}
-              aria-label={showPassword ? "Hide password" : "Show password"}
+              aria-label={
+                showPassword ? "Hide password" : "Show password"
+              }
             >
-              {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              {showPassword ? (
+                <EyeOff className="size-4" />
+              ) : (
+                <Eye className="size-4" />
+              )}
             </button>
           </div>
+
           <FieldError message={errors.password?.message} />
         </div>
 
@@ -83,17 +111,25 @@ export function LoginForm() {
             className="size-3.5 rounded border-border bg-transparent accent-primary"
             {...register("rememberMe")}
           />
+
           Remember me for 30 days
         </label>
 
-        <Button type="submit" className="w-full" isLoading={loginMutation.isPending}>
+        <Button
+          type="submit"
+          className="w-full"
+          isLoading={loginMutation.isPending}
+        >
           Sign in
         </Button>
       </form>
 
       <p className="mt-6 text-center text-[13.5px] text-text-muted">
         Don't have an account?{" "}
-        <Link to={ROUTES.REGISTER} className="font-medium text-primary hover:text-primary-hover">
+        <Link
+          to={ROUTES.REGISTER}
+          className="font-medium text-primary-strong hover:underline"
+        >
           Create one
         </Link>
       </p>

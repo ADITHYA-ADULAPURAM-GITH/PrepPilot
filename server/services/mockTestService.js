@@ -4,6 +4,7 @@ import { Question } from "../models/Question.js";
 import { TestAttempt } from "../models/TestAttempt.js";
 import { UserTopicProgress } from "../models/UserTopicProgress.js";
 import { ApiError } from "../utils/apiResponse.js";
+import { notificationService } from "./notificationService.js";
 
 export const mockTestService = {
   async list(query, userId) {
@@ -30,9 +31,6 @@ export const mockTestService = {
     return { tests: annotated, pagination: { page, limit, total, pages: Math.ceil(total / limit) } };
   },
 
-  // Test detail for the "about to start" screen — question count and
-  // metadata only, never the questions themselves (those are only
-  // revealed once an attempt exists, via getAttemptQuestions below).
   async getById(testId, userId) {
     const test = await MockTest.findOne({ _id: testId, isActive: true }).populate("topic", "title");
     if (!test) {
@@ -51,9 +49,6 @@ export const mockTestService = {
       throw new ApiError(400, "This test has no questions yet");
     }
 
-    // V2 Step 3 — topic-gating: server-side enforcement, independent of
-    // whatever the frontend shows. A test with no `topic` set is
-    // ungated and behaves exactly as before this change.
     if (test.topic) {
       const progress = await UserTopicProgress.findOne({
         user: userId,
@@ -74,12 +69,6 @@ export const mockTestService = {
     });
   },
 
-  // Questions are fetched separately from the attempt, keyed off the
-  // attempt's own `test` ref rather than trusting a testId param again
-  // — guarantees the questions shown always match the test the attempt
-  // was actually started against, even if the test itself changes later.
-  // correctOptionIndex and explanation are stripped unless the attempt
-  // has already been submitted (review mode).
   async getAttemptQuestions(userId, attemptId) {
     const attempt = await TestAttempt.findOne({ _id: attemptId, user: userId }).populate(
       "test",
@@ -122,9 +111,6 @@ export const mockTestService = {
     return attempt;
   },
 
-  // Shared by both manual submit and auto-submit — only the resulting
-  // `status` value differs, so the scoring logic itself lives in one
-  // place rather than being duplicated across two controller actions.
   async submitAttempt(userId, attemptId, { autoSubmitted = false } = {}) {
     const attempt = await TestAttempt.findOne({ _id: attemptId, user: userId });
     if (!attempt) {
@@ -149,6 +135,18 @@ export const mockTestService = {
     attempt.submittedAt = new Date();
 
     await attempt.save();
+
+    // Notification: additive only. Runs after the attempt is already
+    // saved, and notificationService swallows its own errors — a
+    // failure here can never affect the submitted attempt above.
+    const test = await MockTest.findById(attempt.test).select("title");
+    await notificationService.createMockTestResultNotification(userId, {
+      attemptId: attempt._id,
+      testTitle: test?.title || "Mock Test",
+      score: attempt.score,
+      totalQuestions: attempt.totalQuestions,
+    });
+
     return attempt;
   },
 
@@ -179,11 +177,6 @@ export const mockTestService = {
     return attempt;
   },
 
-  // --- V2 Step 3 helpers (topic-gating) -------------------------------
-
-  // Given a list of (possibly topic-populated) MockTest docs, returns
-  // the Set of topic-id strings the user has completed, scoped only to
-  // the topics actually referenced by those tests.
   async _getCompletedTopicIds(userId, tests) {
     const topicIds = tests.filter((t) => t.topic).map((t) => t.topic._id.toString());
     if (topicIds.length === 0) {
@@ -197,9 +190,6 @@ export const mockTestService = {
     return new Set(progress.map((p) => p.topic.toString()));
   },
 
-  // Converts a MockTest doc to a plain object with isLocked/lockedReason
-  // added. Tests with no `topic` are always unlocked — this is the
-  // guarantee that existing, ungated tests behave exactly as before.
   _withEligibility(test, completedTopicIds) {
     const obj = test.toObject();
     if (!obj.topic) {

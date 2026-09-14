@@ -3,6 +3,8 @@ import { ApiResponse } from "../utils/apiResponse.js";
 import { authService } from "../services/authService.js";
 import { refreshCookieMaxAge } from "../utils/jwt.js";
 import { env } from "../config/env.js";
+import { sendEmail } from "../services/emailService.js";
+import { buildLoginConfirmationEmail } from "../emails/loginConfirmationEmail.js";
 
 const REFRESH_COOKIE_NAME = "refreshToken";
 
@@ -13,6 +15,22 @@ const cookieOptions = (rememberMe = true) => ({
   maxAge: refreshCookieMaxAge(rememberMe),
   path: "/api/v1/auth",
 });
+
+// Fire-and-forget: intentionally not awaited by any caller. A failure
+// here must never affect the login response, which has already been
+// sent by the time this runs. Never pass anything beyond name/email/
+// timestamp into the template — no tokens, passwords, or secrets.
+function sendLoginConfirmationEmail(user) {
+  const { subject, html, text } = buildLoginConfirmationEmail({
+    name: user.name,
+    email: user.email,
+    timestamp: new Date(),
+  });
+
+  sendEmail({ to: user.email, subject, html, text }).catch((err) => {
+    console.error(`[login email] Failed to send to ${user.email}:`, err.message);
+  });
+}
 
 export const register = asyncHandler(async (req, res) => {
   const { user, accessToken, refreshToken } = await authService.register(req.body);
@@ -26,6 +44,9 @@ export const login = asyncHandler(async (req, res) => {
 
   res.cookie(REFRESH_COOKIE_NAME, refreshToken, cookieOptions(rememberMe));
   res.status(200).json(new ApiResponse(200, { user, accessToken }, "Signed in"));
+
+  // Response is already fully sent above — this cannot delay or fail the login.
+  sendLoginConfirmationEmail(user);
 });
 
 export const refreshToken = asyncHandler(async (req, res) => {
@@ -54,7 +75,6 @@ export const forgotPassword = asyncHandler(async (req, res) => {
     console.log(`[password reset] ${req.body.email} → ${resetUrl}`);
   }
 
-  // Same response whether or not the account exists — prevents email enumeration.
   res.status(200).json(new ApiResponse(200, null, "If that email exists, a reset link has been sent"));
 });
 

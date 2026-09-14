@@ -1,3 +1,5 @@
+import { LayoutDashboard } from "lucide-react";
+import { motion } from "framer-motion";
 import { useDashboardData } from "@/features/dashboard/hooks/useDashboardData";
 import { DashboardSkeleton } from "@/features/dashboard/components/DashboardSkeleton";
 import { WelcomeHero } from "@/features/dashboard/components/WelcomeHero";
@@ -8,47 +10,82 @@ import { TodaysTasks } from "@/features/dashboard/components/TodaysTasks";
 import { RecentActivity } from "@/features/dashboard/components/RecentActivity";
 import { AIAssistantCard } from "@/features/dashboard/components/AIAssistantCard";
 import { UpcomingDeadlines } from "@/features/dashboard/components/UpcomingDeadlines";
+import { EmptyState } from "@/components/common/EmptyState";
+import { Button } from "@/components/ui/button";
+
+const sectionVariants = {
+  hidden: { opacity: 0, y: 12 },
+  visible: { opacity: 1, y: 0 },
+};
 
 export default function DashboardPage() {
-  const { data, isLoading, isError } = useDashboardData();
+  const { data, isLoading, isError, refetch } = useDashboardData();
 
   if (isLoading) return <DashboardSkeleton />;
 
   if (isError) {
     return (
-      <div className="flex h-[60vh] flex-col items-center justify-center text-center">
-        <p className="text-[14px] text-text-muted">Couldn't load your dashboard right now.</p>
-        <p className="mt-1 text-[13px] text-text-faint">Try refreshing the page.</p>
-      </div>
+      <EmptyState
+        icon={LayoutDashboard}
+        title="Couldn't load your dashboard"
+        description="Something went wrong talking to the server. Try refreshing the page."
+        action={
+          <Button type="button" variant="secondary" onClick={() => refetch?.()}>
+            Retry
+          </Button>
+        }
+      />
     );
   }
 
   return (
     <div className="space-y-6">
-      <WelcomeHero streak={data.user.streak} />
+      <motion.div initial="hidden" animate="visible" variants={sectionVariants} transition={{ duration: 0.25 }}>
+        <WelcomeHero streak={data.user.streak} />
+      </motion.div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={sectionVariants}
+        transition={{ duration: 0.25, delay: 0.05 }}
+        className="grid grid-cols-1 gap-6 lg:grid-cols-3"
+      >
         <div className="lg:col-span-2">
           <ReadinessScoreCard overall={data.readiness.overall} breakdown={data.readiness.breakdown} />
         </div>
         <AIAssistantCard />
-      </div>
+      </motion.div>
 
-      <QuickStatsGrid stats={data.stats} />
+      <motion.div initial="hidden" animate="visible" variants={sectionVariants} transition={{ duration: 0.25, delay: 0.1 }}>
+        <QuickStatsGrid stats={data.stats} />
+      </motion.div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={sectionVariants}
+        transition={{ duration: 0.25, delay: 0.15 }}
+        className="grid grid-cols-1 gap-6 lg:grid-cols-3"
+      >
         <div className="lg:col-span-2">
           <WeeklyProgressPlaceholder />
         </div>
         <TodaysTasks tasks={data.tasks} />
-      </div>
+      </motion.div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={sectionVariants}
+        transition={{ duration: 0.25, delay: 0.2 }}
+        className="grid grid-cols-1 gap-6 lg:grid-cols-3"
+      >
         <div className="lg:col-span-2">
           <RecentActivity activity={data.activity} />
         </div>
         <UpcomingDeadlines deadlines={data.deadlines} />
-      </div>
+      </motion.div>
     </div>
   );
 }

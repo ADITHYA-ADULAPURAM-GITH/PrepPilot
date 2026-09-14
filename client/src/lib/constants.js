@@ -8,6 +8,7 @@ export const ROUTES = {
   FORGOT_PASSWORD: "/forgot-password",
   DASHBOARD: "/dashboard",
   DSA_TRACKER: "/dsa-tracker",
+  DSA_WORKSPACE: "/dsa-tracker/:problemId",
   CS_SUBJECTS: "/cs-subjects",
   COMPANIES: "/companies",
   COMPANY_DETAILS: "/companies/:companyId",
@@ -18,6 +19,7 @@ export const ROUTES = {
   MOCK_TEST_ATTEMPT: "/mock-tests/attempt/:attemptId",
   MOCK_TEST_RESULT: "/mock-tests/result/:attemptId",
   MENTOR: "/mentor",
+  PROFILE: "/profile",
 };
 
 export const AUTH_TOKEN_KEY = "preppilot_access_token";

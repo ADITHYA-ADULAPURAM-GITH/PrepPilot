@@ -25,4 +25,10 @@ export const env = {
   JWT_REFRESH_EXPIRY_SHORT: process.env.JWT_REFRESH_EXPIRY_SHORT || "1d",
   JWT_REFRESH_EXPIRY_LONG: process.env.JWT_REFRESH_EXPIRY_LONG || "30d",
   GEMINI_API_KEY: process.env.GEMINI_API_KEY || null,
+   JUDGE0_API_URL: process.env.JUDGE0_API_URL || null,
+  JUDGE0_API_KEY: process.env.JUDGE0_API_KEY || null,
+  JUDGE0_API_HOST: process.env.JUDGE0_API_HOST || null,
+  EMAIL_USER: process.env.EMAIL_USER || null,
+  EMAIL_APP_PASSWORD: process.env.EMAIL_APP_PASSWORD || null,
+  EMAIL_FROM_NAME: process.env.EMAIL_FROM_NAME || null,
 };
