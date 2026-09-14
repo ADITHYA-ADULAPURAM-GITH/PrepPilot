@@ -41,13 +41,14 @@ export function NotificationBell() {
         aria-label="Notifications"
       >
         <Bell className="size-[17px]" />
+
         {hasUnread && (
           <span className="absolute right-1 top-1 flex size-2 items-center justify-center rounded-full bg-primary ring-2 ring-base" />
         )}
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full z-20 mt-2">
+        <div className="fixed inset-x-4 top-16 z-20 sm:absolute sm:right-0 sm:top-full sm:mt-2 sm:inset-x-auto">
           <NotificationPanel />
         </div>
       )}

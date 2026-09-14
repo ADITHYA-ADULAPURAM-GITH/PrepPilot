@@ -19,7 +19,7 @@ export function NotificationPanel() {
     notifications.some((n) => !n.isRead);
 
   return (
-    <div className="w-[340px] overflow-hidden rounded-2xl border border-border bg-base shadow-xl">
+    <div className="w-full overflow-hidden rounded-2xl border border-border bg-base shadow-xl sm:w-[340px]">
       <div className="flex items-center justify-between border-b border-border px-3.5 py-3">
         <p className="text-[13px] font-semibold text-text">
           Notifications
@@ -81,9 +81,7 @@ export function NotificationPanel() {
             <NotificationItem
               key={notification._id}
               notification={notification}
-              onMarkRead={(id) =>
-                markRead.mutate(id)
-              }
+              onMarkRead={(id) => markRead.mutate(id)}
             />
           ))}
       </div>

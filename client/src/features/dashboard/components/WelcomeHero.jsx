@@ -29,36 +29,27 @@ export function WelcomeHero({ streak = 0 }) {
     >
       {/* =========================================================
           CINEMATIC BACKGROUND
-          All colors/opacities are driven by --hero-* CSS variables
-          (defined in index.css) so dark and light themes can be
-          tuned independently. Dark-mode values are set to match the
-          original hand-tuned look exactly; light-mode values are a
-          softer, lower-alpha variant tuned for a cream background.
           ========================================================= */}
 
       <div
         className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
         aria-hidden="true"
       >
-        {/* Deep atmospheric base */}
         <div
           className="absolute inset-0"
           style={{ background: "var(--hero-tint)" }}
         />
 
-        {/* Large soft sunset glow */}
         <div
           className="absolute -right-[8%] -top-[55%] h-[440px] w-[720px] rounded-full blur-[90px]"
           style={{ background: "var(--hero-glow-1)" }}
         />
 
-        {/* Horizon glow */}
         <div
           className="absolute -bottom-[48%] right-[12%] h-[380px] w-[680px] rounded-full blur-[70px]"
           style={{ background: "var(--hero-glow-2)" }}
         />
 
-        {/* Soft sun */}
         <div
           className="absolute right-[25%] top-[22%] size-[76px] rounded-full"
           style={{
@@ -68,15 +59,8 @@ export function WelcomeHero({ streak = 0 }) {
           }}
         />
 
-        {/* Subtle atmospheric ring around sun */}
-        <div
-          className="absolute right-[calc(25%-30px)] top-[calc(22%-30px)] size-[136px] rounded-full border border-white/[0.07]"
-        />
+        <div className="absolute right-[calc(25%-30px)] top-[calc(22%-30px)] size-[136px] rounded-full border border-white/[0.07]" />
 
-        {/* =====================================================
-            PREMIUM TOPOGRAPHIC LINES
-            Instead of crude mountain polygons.
-            ===================================================== */}
         <svg
           className="absolute bottom-[-5%] right-[-3%] h-[90%] w-[62%]"
           style={{ opacity: "var(--hero-topo-opacity)" }}
@@ -116,7 +100,6 @@ export function WelcomeHero({ streak = 0 }) {
           />
         </svg>
 
-        {/* Very subtle vertical atmospheric light */}
         <div
           className="absolute right-[18%] top-0 h-full w-px"
           style={{
@@ -126,13 +109,11 @@ export function WelcomeHero({ streak = 0 }) {
           }}
         />
 
-        {/* Bottom cinematic fade */}
         <div
           className="absolute inset-x-0 bottom-0 h-[55%]"
           style={{ background: "var(--hero-bottom-fade)" }}
         />
 
-        {/* Left readability fade */}
         <div
           className="absolute inset-y-0 left-0 w-[68%]"
           style={{ background: "var(--hero-left-fade)" }}
@@ -164,7 +145,7 @@ export function WelcomeHero({ streak = 0 }) {
         </div>
 
         {/* Right action capsule */}
-        <div className="flex w-full shrink-0 items-center justify-between gap-2.5 rounded-2xl border border-white/[0.09] bg-black/[0.10] p-2 backdrop-blur-xl dark:bg-black/20 sm:w-auto sm:justify-start">
+        <div className="flex w-full shrink-0 flex-col items-stretch gap-2.5 rounded-2xl border border-white/[0.09] bg-black/[0.10] p-2 backdrop-blur-xl dark:bg-black/20 sm:w-auto sm:flex-row sm:items-center sm:justify-start">
           {/* Streak */}
           <div className="flex items-center gap-3 rounded-xl px-3 py-2">
             <div className="flex size-9 items-center justify-center rounded-lg border border-primary/20 bg-primary/10">
@@ -187,7 +168,7 @@ export function WelcomeHero({ streak = 0 }) {
             size="lg"
             onClick={() => continuePrep.mutate()}
             isLoading={continuePrep.isPending}
-            className="shadow-[0_8px_24px_rgba(216,90,48,0.18)]"
+            className="w-full shadow-[0_8px_24px_rgba(216,90,48,0.18)] sm:w-auto"
           >
             Continue prep
             <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
